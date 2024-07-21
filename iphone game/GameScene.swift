@@ -29,7 +29,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         
         character = SKSpriteNode(imageNamed: "monster")
         character.size = CGSize(width: 80, height: 90)
-        character.position = CGPoint(x: self.frame.width / 2, y: self.frame.height / 2)
+        character.position = CGPoint(x: frame.midX, y: frame.midY)
         character.physicsBody = SKPhysicsBody(circleOfRadius: character.frame.height / 2)
         character.physicsBody?.categoryBitMask = PhysicsCategory.character
         character.physicsBody?.collisionBitMask = 0  // No collision with other bodies
@@ -108,15 +108,17 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     }
     
     override func update(_ currentTime: TimeInterval) {
-        // Update instead of hard values -> frame of phone
         // check character position
-        if character.position.x > 450.0 {
+        var maxWidth = self.frame.width
+        var maxHeight = self.frame.height
+        
+        if character.position.x > maxWidth {
             character.position.x = 0.0
         }
         if character.position.x < 0.0 {
-            character.position.x = 450.0
+            character.position.x = maxWidth
         }
-        if character.position.y > 1000.0 {
+        if character.position.y > maxHeight {
             character.position.y = 10.0
         }
         if character.position.y < -10.0 {

@@ -16,15 +16,14 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     
     var ground = SKSpriteNode()
     var character = SKSpriteNode()
-    var bullet = SKSpriteNode()
+    var bulletsArray = [SKSpriteNode()]
     var labelClicks = SKLabelNode(fontNamed: "AvenirNext-Bold")
     
     var clicks = 5
+    var bulletCount = 2
     
     override func didMove(to view: SKView) {
         self.physicsWorld.contactDelegate = self
-        
-//        self.anchorPoint = CGPoint(x: 0, y: 0)
         self.physicsWorld.gravity = CGVector(dx: 0.0, dy: -2.0)
         
         character = SKSpriteNode(imageNamed: "monster")
@@ -32,45 +31,50 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         character.position = CGPoint(x: frame.midX, y: frame.midY)
         character.physicsBody = SKPhysicsBody(circleOfRadius: character.frame.height / 2)
         character.physicsBody?.categoryBitMask = PhysicsCategory.character
-        character.physicsBody?.collisionBitMask = 0  // No collision with other bodies
-        character.physicsBody?.contactTestBitMask = PhysicsCategory.bullet  // Notify on contact with bullet
+        character.physicsBody?.collisionBitMask = 0
+        character.physicsBody?.contactTestBitMask = PhysicsCategory.bullet
         character.physicsBody?.affectedByGravity = false
         character.physicsBody?.isDynamic = true
         self.addChild(character)
                 
-        bullet = SKSpriteNode(imageNamed: "bullet")
-        bullet.size = CGSize(width: 50, height: 50)
-        bullet.position = CGPoint(x: self.frame.midX / 3, y: self.frame.height / 2)
-        bullet.physicsBody = SKPhysicsBody(rectangleOf: bullet.size)
-        bullet.physicsBody?.isDynamic = false  // Ensure bullet doesn't move under physics simulation
-        bullet.physicsBody?.categoryBitMask = PhysicsCategory.bullet
-        bullet.physicsBody?.contactTestBitMask = PhysicsCategory.character
-        bullet.physicsBody?.collisionBitMask = 0  // No need to collide with anything
-        self.addChild(bullet)
+        createBullets()
         
         //display clicks
         displayClick()
     }
     
     func didBegin(_ contact: SKPhysicsContact) {
-        let firstBody = contact.bodyA
-        let secondBody = contact.bodyB
-        
-        if firstBody.categoryBitMask == PhysicsCategory.character && secondBody.categoryBitMask == PhysicsCategory.bullet
-            || firstBody.categoryBitMask == PhysicsCategory.bullet && secondBody.categoryBitMask == PhysicsCategory.character
-        {
-            clicks+=1
-            updateClick()
+        var bulletBody: SKPhysicsBody?
+
+        if contact.bodyA.categoryBitMask == PhysicsCategory.bullet && contact.bodyB.categoryBitMask == PhysicsCategory.character {
+            bulletBody = contact.bodyA
+        } else if contact.bodyA.categoryBitMask == PhysicsCategory.character && contact.bodyB.categoryBitMask == PhysicsCategory.bullet {
+            bulletBody = contact.bodyB
+        }
+
+        if let bulletNode = bulletBody?.node as? SKSpriteNode, let index = bulletsArray.firstIndex(of: bulletNode) {
             
+            bulletNode.removeFromParent()
+            bulletsArray.remove(at: index)
+
+            // clicks and bullets count logic
+            clicks += 1
+            updateClick()
+
             if clicks > 0 {
                 self.isUserInteractionEnabled = true
             }
-            bullet.removeFromParent()
-        }
-        
-        // handle 0 clicks but bullet gained
-        if clicks == 0 && (firstBody.categoryBitMask == PhysicsCategory.character && secondBody.categoryBitMask == PhysicsCategory.bullet) || clicks == 0 && (firstBody.categoryBitMask == PhysicsCategory.bullet && secondBody.categoryBitMask == PhysicsCategory.character) {
-            self.isUserInteractionEnabled = true
+
+            bulletCount -= 1
+            if bulletCount < 0 {
+                bulletCount = 2
+                createBullets()
+            }
+
+            // enable interaction if clicks == 0 but character contact bullet
+            if clicks == 0 && bulletBody != nil {
+                self.isUserInteractionEnabled = true
+            }
         }
     }
     
@@ -97,7 +101,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                 character.physicsBody?.linearDamping = 1.0
             }
             
-            //Decrement clicks
+            //decrement clicks
             clicks -= 1
             updateClick()
             
@@ -109,8 +113,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     
     override func update(_ currentTime: TimeInterval) {
         // check character position
-        var maxWidth = self.frame.width
-        var maxHeight = self.frame.height
+        let maxWidth = self.frame.width
+        let maxHeight = self.frame.height
         
         if character.position.x > maxWidth {
             character.position.x = 0.0
@@ -134,10 +138,39 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             self.run(SKAction.sequence([wait, transition]))
         }
         
-        // Update clicks and handle 0 clicks
         updateClick()
         if clicks == 0 {
             self.isUserInteractionEnabled = false
+        }
+    }
+    
+    func createBullets() {
+        bulletsArray.removeAll()
+        
+        for _ in 0...bulletCount {
+            let bullet = SKSpriteNode(imageNamed: "bullet")
+            bullet.size = CGSize(width: 50, height: 50)
+            bullet.physicsBody = SKPhysicsBody(rectangleOf: bullet.size)
+            bullet.physicsBody?.isDynamic = false
+            bullet.physicsBody?.categoryBitMask = PhysicsCategory.bullet
+            bullet.physicsBody?.contactTestBitMask = PhysicsCategory.character
+            bullet.physicsBody?.collisionBitMask = 0
+            bulletsArray.append(bullet)
+        }
+        
+        spawnBullets()
+    }
+
+    func spawnBullets() {
+        for bullet in bulletsArray {
+            if bullet.parent != nil {
+                bullet.removeFromParent()
+            }
+            
+            let randomX = CGFloat.random(in: 1...self.frame.width - 50)
+            let randomY = CGFloat.random(in: 1...self.frame.height - 50)
+            bullet.position = CGPoint(x: randomX, y: randomY)
+            addChild(bullet)
         }
     }
     
@@ -148,8 +181,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     
     func displayClick() {
         labelClicks.text = "\(clicks)"
-        labelClicks.fontColor = .white
-        labelClicks.fontSize = 60
+        labelClicks.fontColor = UIColor(displayP3Red: 30.0, green: 12.1, blue: 102.3, alpha: 0.5)
+        labelClicks.fontSize = 100
         labelClicks.position = CGPoint(x: frame.midX, y: frame.midY + frame.size.height/4)
         addChild(labelClicks)
     }

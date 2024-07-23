@@ -11,6 +11,7 @@ struct PhysicsCategory {
     static let character : UInt32 = 0x1 << 1
     static let bullet : UInt32 = 0x1 << 2
     static let coin : UInt32 = 0x1 << 3
+    static let bomb : UInt32 = 0x1 << 4
 }
 
 class GameScene: SKScene, SKPhysicsContactDelegate {
@@ -19,11 +20,13 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     var character = SKSpriteNode()
     var bulletsArray = [SKSpriteNode()]
     var coinsArray = [SKSpriteNode()]
+    var bombsArray = [SKSpriteNode()]
     var labelClicks = SKLabelNode(fontNamed: "AvenirNext-Bold")
     
     var clicks = 5
     var bulletCount = 2
     var coinCount = 2
+    var bombCount = 0
     
     override func didMove(to view: SKView) {
         self.physicsWorld.contactDelegate = self
@@ -42,6 +45,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                 
         createBullets()
         createCoins()
+        createBombs()
         displayClick()
     }
     
@@ -97,6 +101,30 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                 coinCount = 2
                 createCoins()
             }
+        }
+        
+        // character bomb contact logic
+        var bombBody : SKPhysicsBody?
+        if contact.bodyA.categoryBitMask == PhysicsCategory.bomb && contact.bodyB.categoryBitMask == PhysicsCategory.character {
+            bombBody = contact.bodyA
+        } else if contact.bodyA.categoryBitMask == PhysicsCategory.character && contact.bodyB.categoryBitMask == PhysicsCategory.bomb {
+            bombBody = contact.bodyB
+        }
+        
+        if let bombNode = bombBody?.node as? SKSpriteNode, let index = bombsArray.firstIndex(of: bombNode) {
+            
+            let gameover = SKLabelNode(text: "Game Over")
+            gameover.position = CGPoint(x: self.frame.midX, y: self.frame.midY)
+            addChild(gameover)
+            character.physicsBody?.velocity = CGVector(dx: 0, dy: 0)
+            character.physicsBody?.affectedByGravity = false
+            isUserInteractionEnabled = false
+            
+            let wait = SKAction.wait(forDuration: 1.5)
+            let transition = SKAction.run {
+                self.switchScene()
+            }
+            self.run(SKAction.sequence([wait, transition]))
         }
     }
     
@@ -223,6 +251,36 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             let randomY = CGFloat.random(in: 1...self.frame.height - 80)
             coin.position = CGPoint(x: randomX, y: randomY)
             addChild(coin)
+        }
+    }
+    
+    func createBombs() {
+        bombsArray.removeAll()
+        
+        for _ in 0...bombCount {
+            let bomb = SKSpriteNode(imageNamed: "bomb")
+            bomb.size = CGSize(width: 50, height: 50)
+            bomb.physicsBody = SKPhysicsBody(rectangleOf: bomb.size)
+            bomb.physicsBody?.isDynamic = false
+            bomb.physicsBody?.categoryBitMask = PhysicsCategory.bomb
+            bomb.physicsBody?.contactTestBitMask = PhysicsCategory.character
+            bomb.physicsBody?.collisionBitMask = 0
+            bombsArray.append(bomb)
+        }
+        
+        spawnBombs()
+    }
+    
+    func spawnBombs() {
+        for bomb in bombsArray {
+            if bomb.parent != nil {
+                bomb.removeFromParent()
+            }
+            
+            let randomX = CGFloat.random(in: 1...self.frame.width - 80)
+            let randomY = CGFloat.random(in: 1...self.frame.height - 80)
+            bomb.position = CGPoint(x: randomX, y: randomY)
+            addChild(bomb)
         }
     }
     

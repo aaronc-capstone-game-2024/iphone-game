@@ -10,6 +10,7 @@ import SpriteKit
 struct PhysicsCategory {
     static let character : UInt32 = 0x1 << 1
     static let bullet : UInt32 = 0x1 << 2
+    static let coin : UInt32 = 0x1 << 3
 }
 
 class GameScene: SKScene, SKPhysicsContactDelegate {
@@ -17,10 +18,12 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     var ground = SKSpriteNode()
     var character = SKSpriteNode()
     var bulletsArray = [SKSpriteNode()]
+    var coinsArray = [SKSpriteNode()]
     var labelClicks = SKLabelNode(fontNamed: "AvenirNext-Bold")
     
     var clicks = 5
     var bulletCount = 2
+    var coinCount = 2
     
     override func didMove(to view: SKView) {
         self.physicsWorld.contactDelegate = self
@@ -38,14 +41,13 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         self.addChild(character)
                 
         createBullets()
-        
-        //display clicks
+        createCoins()
         displayClick()
     }
     
     func didBegin(_ contact: SKPhysicsContact) {
+        //character bullet contact logic
         var bulletBody: SKPhysicsBody?
-
         if contact.bodyA.categoryBitMask == PhysicsCategory.bullet && contact.bodyB.categoryBitMask == PhysicsCategory.character {
             bulletBody = contact.bodyA
         } else if contact.bodyA.categoryBitMask == PhysicsCategory.character && contact.bodyB.categoryBitMask == PhysicsCategory.bullet {
@@ -74,6 +76,26 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             // enable interaction if clicks == 0 but character contact bullet
             if clicks == 0 && bulletBody != nil {
                 self.isUserInteractionEnabled = true
+            }
+        }
+        
+        // character coin contact logic
+        var coinBody : SKPhysicsBody?
+        if contact.bodyA.categoryBitMask == PhysicsCategory.coin && contact.bodyB.categoryBitMask == PhysicsCategory.character {
+            coinBody = contact.bodyA
+        } else if contact.bodyB.categoryBitMask == PhysicsCategory.coin && contact.bodyA.categoryBitMask == PhysicsCategory.character {
+            coinBody = contact.bodyB
+        }
+        
+        if let coinNode = coinBody?.node as? SKSpriteNode, let index = coinsArray.firstIndex(of: coinNode) {
+            
+            coinNode.removeFromParent()
+            coinsArray.remove(at: index)
+            
+            coinCount -= 1
+            if coinCount < 0 {
+                coinCount = 2
+                createCoins()
             }
         }
     }
@@ -167,10 +189,40 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                 bullet.removeFromParent()
             }
             
-            let randomX = CGFloat.random(in: 1...self.frame.width - 50)
-            let randomY = CGFloat.random(in: 1...self.frame.height - 50)
+            let randomX = CGFloat.random(in: 1...self.frame.width - 80)
+            let randomY = CGFloat.random(in: 1...self.frame.height - 80)
             bullet.position = CGPoint(x: randomX, y: randomY)
             addChild(bullet)
+        }
+    }
+    
+    func createCoins() {
+        coinsArray.removeAll()
+        
+        for _ in 0...coinCount {
+            let coin = SKSpriteNode(imageNamed: "coin")
+            coin.size = CGSize(width: 50, height: 50)
+            coin.physicsBody = SKPhysicsBody(rectangleOf: coin.size)
+            coin.physicsBody?.isDynamic = false
+            coin.physicsBody?.categoryBitMask = PhysicsCategory.coin
+            coin.physicsBody?.contactTestBitMask = PhysicsCategory.character
+            coin.physicsBody?.collisionBitMask = 0
+            coinsArray.append(coin)
+        }
+        
+        spawnCoins()
+    }
+    
+    func spawnCoins() {
+        for coin in coinsArray {
+            if coin.parent != nil {
+                coin.removeFromParent()
+            }
+            
+            let randomX = CGFloat.random(in: 1...self.frame.width - 80)
+            let randomY = CGFloat.random(in: 1...self.frame.height - 80)
+            coin.position = CGPoint(x: randomX, y: randomY)
+            addChild(coin)
         }
     }
     

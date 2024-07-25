@@ -14,7 +14,7 @@ class GameManager {
     private init() {}
     
     var score: Int = 0
-    var highscore: Int = 12
+    var highscore: Int = 0
     var skins = [SKSpriteNode()]
     var backgrounds = [SKSpriteNode()]
 }

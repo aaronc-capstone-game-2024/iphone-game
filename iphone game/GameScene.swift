@@ -14,6 +14,16 @@ struct PhysicsCategory {
     static let bomb : UInt32 = 0x1 << 4
 }
 
+extension CGPoint {
+    func length() -> CGFloat {
+        return sqrt(x*x + y*y)
+    }
+
+    static func -(left: CGPoint, right: CGPoint) -> CGPoint {
+        return CGPoint(x: left.x - right.x, y: left.y - right.y)
+    }
+}
+
 class GameScene: SKScene, SKPhysicsContactDelegate {
     
     var ground = SKSpriteNode()
@@ -24,6 +34,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     var labelClicks = SKLabelNode(fontNamed: "AvenirNext-Bold")
     var scoreLabel = SKLabelNode(text: "Score: \(GameManager.shared.score)")
     var coinLabel = SKLabelNode(text: "0")
+    var tapLabel = SKLabelNode(text: "TAP!")
     
     var clicks = 10
     var bulletCount = 3
@@ -35,6 +46,25 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     var upgradedAt150 = false
     var upgradedAt200 = false
     var upgradedAt250 = false
+    
+    var itemPosition: [String: [CGPoint]] = [
+        "coins": [],
+        "bullets": [],
+        "bombs": []
+    ]
+    
+    func positionOverlaps(_ newPosition: CGPoint) -> Bool {
+        let safeZoneRadius: CGFloat = 50 // adjust radius as necessary
+
+        for (_, positions) in itemPosition {
+            for position in positions {
+                if (position - newPosition).length() <= safeZoneRadius {
+                    return true
+                }
+            }
+        }
+        return false
+    }
     
     override func didMove(to view: SKView) {
         self.physicsWorld.contactDelegate = self
@@ -50,6 +80,11 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         character.physicsBody?.affectedByGravity = false
         character.physicsBody?.isDynamic = true
         self.addChild(character)
+        
+        tapLabel.fontSize = 100
+        tapLabel.position = CGPoint(x: frame.midX, y: frame.midY + 100)
+        tapLabel.color = UIColor(white: 1.0, alpha: 0.5)
+        addChild(tapLabel)
                 
         createBullets()
         createCoins()
@@ -142,11 +177,15 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                 self.switchScene()
             }
             self.run(SKAction.sequence([wait, transition]))
+            if GameManager.shared.score > GameManager.shared.highscore {
+                GameManager.shared.highscore = GameManager.shared.score
+            }
             GameManager.shared.score = 0
         }
     }
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+        tapLabel.removeFromParent()
         if clicks > 0 {
             character.physicsBody?.affectedByGravity = true
             if let touch = touches.first {
@@ -204,6 +243,9 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                 self.switchScene()
             }
             self.run(SKAction.sequence([wait, transition]))
+            if GameManager.shared.score > GameManager.shared.highscore {
+                GameManager.shared.highscore = GameManager.shared.score
+            }
             GameManager.shared.score = 0
         }
         
@@ -224,7 +266,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             bullet.physicsBody = SKPhysicsBody(rectangleOf: CGSize(width: bullet.frame.width / 1.7, height: bullet.frame.height / 1.4))
             bullet.physicsBody?.isDynamic = false
             bullet.physicsBody?.categoryBitMask = PhysicsCategory.bullet
-            bullet.physicsBody?.contactTestBitMask = PhysicsCategory.character
+            bullet.physicsBody?.contactTestBitMask = PhysicsCategory.character | PhysicsCategory.bomb
             bullet.physicsBody?.collisionBitMask = 0
             bulletsArray.append(bullet)
         }
@@ -238,17 +280,16 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                 bullet.removeFromParent()
             }
             
-            var randomX: CGFloat = 0
-            var randomY: CGFloat = 0
-            let safeZoneRadius: CGFloat = 100
-
-            // repeat until bomb is not spawned on character
+            var newBulletPosition: CGPoint
             repeat {
-                randomX = CGFloat.random(in: 1...(self.frame.width - 80))
-                randomY = CGFloat.random(in: 1...(self.frame.height - 80))
-            } while sqrt(pow(randomX - frame.midX, 2) + pow(randomY - frame.midY, 2)) < safeZoneRadius
+                newBulletPosition = CGPoint(
+                    x: CGFloat.random(in: 0..<self.frame.width - 50),
+                    y: CGFloat.random(in: 0..<self.frame.height - 50)
+                )
+            } while positionOverlaps(newBulletPosition)
 
-            bullet.position = CGPoint(x: randomX, y: randomY)
+            bullet.position = newBulletPosition
+            itemPosition["bullets"]?.append(newBulletPosition)
             addChild(bullet)
         }
     }
@@ -263,7 +304,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             coin.physicsBody = SKPhysicsBody(circleOfRadius: coin.frame.height / 2.5)
             coin.physicsBody?.isDynamic = false
             coin.physicsBody?.categoryBitMask = PhysicsCategory.coin
-            coin.physicsBody?.contactTestBitMask = PhysicsCategory.character
+            coin.physicsBody?.contactTestBitMask = PhysicsCategory.character | PhysicsCategory.bomb
             coin.physicsBody?.collisionBitMask = 0
             coinsArray.append(coin)
         }
@@ -277,17 +318,16 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                 coin.removeFromParent()
             }
             
-            var randomX: CGFloat = 0
-            var randomY: CGFloat = 0
-            let safeZoneRadius: CGFloat = 100
-
-            // repeat until coin is not spawned on character
+            var newCoinPosition: CGPoint
             repeat {
-                randomX = CGFloat.random(in: 1...(self.frame.width - 80))
-                randomY = CGFloat.random(in: 1...(self.frame.height - 80))
-            } while sqrt(pow(randomX - frame.midX, 2) + pow(randomY - frame.midY, 2)) < safeZoneRadius
+                newCoinPosition = CGPoint(
+                    x: CGFloat.random(in: 0..<self.frame.width - 50),
+                    y: CGFloat.random(in: 0..<self.frame.height - 50)
+                )
+            } while positionOverlaps(newCoinPosition)
 
-            coin.position = CGPoint(x: randomX, y: randomY)
+            coin.position = newCoinPosition
+            itemPosition["coins"]?.append(newCoinPosition)
             addChild(coin)
         }
     }
@@ -316,17 +356,16 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                 bomb.removeFromParent()
             }
             
-            var randomX: CGFloat = 0
-            var randomY: CGFloat = 0
-            let safeZoneRadius: CGFloat = 100
-
-            // repeat until bomb is not spawned on character
+            var newBombPosition: CGPoint
             repeat {
-                randomX = CGFloat.random(in: 1...(self.frame.width - 80))
-                randomY = CGFloat.random(in: 1...(self.frame.height - 80))
-            } while sqrt(pow(randomX - frame.midX, 2) + pow(randomY - frame.midY, 2)) < safeZoneRadius
+                newBombPosition = CGPoint(
+                    x: CGFloat.random(in: 0..<self.frame.width - 30),
+                    y: CGFloat.random(in: 0..<self.frame.height - 50)
+                )
+            } while positionOverlaps(newBombPosition)
 
-            bomb.position = CGPoint(x: randomX, y: randomY)
+            bomb.position = newBombPosition
+            itemPosition["bombs"]?.append(newBombPosition)
             addChild(bomb)
         }
     }

@@ -22,11 +22,19 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     var coinsArray = [SKSpriteNode()]
     var bombsArray = [SKSpriteNode()]
     var labelClicks = SKLabelNode(fontNamed: "AvenirNext-Bold")
+    var scoreLabel = SKLabelNode(text: "Score: \(GameManager.shared.score)")
+    var coinLabel = SKLabelNode(text: "0")
     
-    var clicks = 5
-    var bulletCount = 2
-    var coinCount = 2
+    var clicks = 10
+    var bulletCount = 3
+    var coinCount = 3
     var bombCount = 0
+    var currCoins = 0
+    
+    var upgradedAt100 = false
+    var upgradedAt150 = false
+    var upgradedAt200 = false
+    var upgradedAt250 = false
     
     override func didMove(to view: SKView) {
         self.physicsWorld.contactDelegate = self
@@ -35,7 +43,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         character = SKSpriteNode(imageNamed: "monster")
         character.size = CGSize(width: 80, height: 90)
         character.position = CGPoint(x: frame.midX, y: frame.midY)
-        character.physicsBody = SKPhysicsBody(circleOfRadius: character.frame.height / 2)
+        character.physicsBody = SKPhysicsBody(circleOfRadius: character.frame.height / 2.35)
         character.physicsBody?.categoryBitMask = PhysicsCategory.character
         character.physicsBody?.collisionBitMask = 0
         character.physicsBody?.contactTestBitMask = PhysicsCategory.bullet
@@ -47,6 +55,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         createCoins()
         createBombs()
         displayClick()
+        scoreCoinLabels()
     }
     
     func didBegin(_ contact: SKPhysicsContact) {
@@ -76,40 +85,15 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                 bulletCount = 2
                 createBullets()
             }
+            
+            GameManager.shared.score += 2
+            updateScore()
 
             // enable interaction if clicks == 0 but character contact bullet
             if clicks == 0 && bulletBody != nil {
                 self.isUserInteractionEnabled = true
             }
         }
-        
-//        // bullet coin bomb contact
-//         if (contact.bodyA.categoryBitMask == PhysicsCategory.bullet && (contact.bodyB.categoryBitMask == PhysicsCategory.coin || contact.bodyB.categoryBitMask == PhysicsCategory.bomb)) ||
-//        (contact.bodyB.categoryBitMask == PhysicsCategory.bullet && (contact.bodyA.categoryBitMask == PhysicsCategory.coin || contact.bodyA.categoryBitMask == PhysicsCategory.bomb)) {
-//         var bulletBody: SKPhysicsBody
-//         var objectBody: SKPhysicsBody
-//
-//         if contact.bodyA.categoryBitMask == PhysicsCategory.bullet {
-//             bulletBody = contact.bodyA
-//             objectBody = contact.bodyB
-//         } else {
-//             bulletBody = contact.bodyB
-//             objectBody = contact.bodyA
-//         }
-//
-//         guard let bulletNode = bulletBody.node as? SKSpriteNode, let objectNode = objectBody.node as? SKSpriteNode else {
-//             return
-//         }
-//
-//         // Calculate the minimum move distance to avoid overlap, assuming rightward movement
-//         let overlapAmount = (bulletNode.size.width / 2) + (objectNode.size.width / 2) + 5 // 5 is a buffer distance
-//
-//         // Move bullet to the right of the object
-//         bulletNode.position.x = objectNode.position.x + overlapAmount
-//
-//         // Ensure bullet doesn't move outside the bounds of the scene
-//         bulletNode.position.x = min(bulletNode.position.x, self.size.width - bulletNode.size.width / 2)
-//     }
         
         // character coin contact logic
         var coinBody : SKPhysicsBody?
@@ -129,6 +113,10 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                 coinCount = 2
                 createCoins()
             }
+            
+            GameManager.shared.score += 5
+            currCoins += 1
+            updateScore()
         }
         
         // character bomb contact logic
@@ -139,7 +127,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             bombBody = contact.bodyB
         }
         
-        if let bombNode = bombBody?.node as? SKSpriteNode {
+        if bombBody?.node is SKSpriteNode {
             // when adding more bombs in the logic then create index
             
             let gameover = SKLabelNode(text: "Game Over")
@@ -154,6 +142,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                 self.switchScene()
             }
             self.run(SKAction.sequence([wait, transition]))
+            GameManager.shared.score = 0
         }
     }
     
@@ -195,16 +184,16 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         let maxWidth = self.frame.width
         let maxHeight = self.frame.height
         
-        if character.position.x > maxWidth {
+        if character.position.x > maxWidth + 10 {
             character.position.x = 0.0
         }
-        if character.position.x < 0.0 {
+        if character.position.x < -10.0 {
             character.position.x = maxWidth
         }
         if character.position.y > maxHeight {
             character.position.y = 10.0
         }
-        if character.position.y < -10.0 {
+        if character.position.y < -20.0 {
             let gameover = SKLabelNode(text: "Game Over")
             gameover.position = CGPoint(x: self.frame.midX, y: self.frame.midY)
             addChild(gameover)
@@ -215,15 +204,18 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                 self.switchScene()
             }
             self.run(SKAction.sequence([wait, transition]))
+            GameManager.shared.score = 0
         }
         
         updateClick()
         if clicks == 0 {
             self.isUserInteractionEnabled = false
         }
+        
     }
     
     func createBullets() {
+        bulletsArray.forEach { $0.removeFromParent() }
         bulletsArray.removeAll()
         
         for _ in 0...bulletCount {
@@ -262,6 +254,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     }
     
     func createCoins() {
+        coinsArray.forEach { $0.removeFromParent() }
         coinsArray.removeAll()
         
         for _ in 0...coinCount {
@@ -300,6 +293,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     }
     
     func createBombs() {
+        bombsArray.forEach { $0.removeFromParent() }
         bombsArray.removeAll()
         
         for _ in 0...bombCount {
@@ -353,4 +347,53 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     func updateClick() {
         labelClicks.text = "\(clicks)"
     }
+    
+    func scoreCoinLabels() {
+        scoreLabel.position = CGPoint(x: self.frame.midX - 130, y: self.frame.size.height - 100)
+        scoreLabel.fontSize = 25
+        addChild(scoreLabel)
+        
+        coinLabel.position = CGPoint(x: self.frame.midX + 130, y: self.frame.size.height - 100)
+        coinLabel.fontSize = 25
+        let coinImage = SKSpriteNode(imageNamed: "coin")
+        coinImage.size = CGSize(width: 35, height: 35)
+        coinImage.position =  CGPoint(x: coinLabel.frame.minX - coinImage.size.width / 2 - 10, y: coinLabel.frame.midY)
+        addChild(coinLabel)
+        addChild(coinImage)
+    }
+    
+    func updateScore() {
+        scoreLabel.text = "Score: \(GameManager.shared.score)"
+        coinLabel.text = "\(currCoins)"
+                
+        // score logic
+        if GameManager.shared.score >= 100 && !upgradedAt100 {
+            bulletCount = 2
+            coinCount = 2
+            createBullets()
+            createCoins()
+            upgradedAt100 = true
+        }
+                
+        if GameManager.shared.score >= 150 && !upgradedAt150 {
+            bombCount = 1
+            createBombs()
+            upgradedAt150 = true
+        }
+                
+        if GameManager.shared.score >= 200 && !upgradedAt200 {
+            bulletCount = 1
+            coinCount = 1
+            createBullets()
+            createCoins()
+            upgradedAt200 = true
+        }
+                
+        if GameManager.shared.score >= 250 && !upgradedAt250 {
+            bombCount = 2
+            createBombs()
+            upgradedAt250 = true
+        }
+    }
+    
 }

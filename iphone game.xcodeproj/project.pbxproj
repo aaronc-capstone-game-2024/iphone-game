@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		97518D832C51546F00B6BBF3 /* GameManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 97518D822C51546F00B6BBF3 /* GameManager.swift */; };
 		97672AE32C3EE954002F6616 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 97672AE22C3EE954002F6616 /* AppDelegate.swift */; };
 		97672AE92C3EE954002F6616 /* GameScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 97672AE82C3EE954002F6616 /* GameScene.swift */; };
 		97672AEB2C3EE954002F6616 /* GameViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 97672AEA2C3EE954002F6616 /* GameViewController.swift */; };
@@ -17,6 +18,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		97518D822C51546F00B6BBF3 /* GameManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameManager.swift; sourceTree = "<group>"; };
 		97672ADF2C3EE954002F6616 /* iphone game.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "iphone game.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		97672AE22C3EE954002F6616 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		97672AE82C3EE954002F6616 /* GameScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameScene.swift; sourceTree = "<group>"; };
@@ -61,6 +63,7 @@
 				97672AE82C3EE954002F6616 /* GameScene.swift */,
 				97672AEA2C3EE954002F6616 /* GameViewController.swift */,
 				97C737962C46E90C001AEEF1 /* MenuScene.swift */,
+				97518D822C51546F00B6BBF3 /* GameManager.swift */,
 				97672AEC2C3EE954002F6616 /* Main.storyboard */,
 				97672AEF2C3EE958002F6616 /* Assets.xcassets */,
 				97672AF12C3EE958002F6616 /* LaunchScreen.storyboard */,
@@ -143,6 +146,7 @@
 				97C737972C46E90C001AEEF1 /* MenuScene.swift in Sources */,
 				97672AEB2C3EE954002F6616 /* GameViewController.swift in Sources */,
 				97672AE32C3EE954002F6616 /* AppDelegate.swift in Sources */,
+				97518D832C51546F00B6BBF3 /* GameManager.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

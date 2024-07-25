@@ -83,6 +83,34 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             }
         }
         
+//        // bullet coin bomb contact
+//         if (contact.bodyA.categoryBitMask == PhysicsCategory.bullet && (contact.bodyB.categoryBitMask == PhysicsCategory.coin || contact.bodyB.categoryBitMask == PhysicsCategory.bomb)) ||
+//        (contact.bodyB.categoryBitMask == PhysicsCategory.bullet && (contact.bodyA.categoryBitMask == PhysicsCategory.coin || contact.bodyA.categoryBitMask == PhysicsCategory.bomb)) {
+//         var bulletBody: SKPhysicsBody
+//         var objectBody: SKPhysicsBody
+//
+//         if contact.bodyA.categoryBitMask == PhysicsCategory.bullet {
+//             bulletBody = contact.bodyA
+//             objectBody = contact.bodyB
+//         } else {
+//             bulletBody = contact.bodyB
+//             objectBody = contact.bodyA
+//         }
+//
+//         guard let bulletNode = bulletBody.node as? SKSpriteNode, let objectNode = objectBody.node as? SKSpriteNode else {
+//             return
+//         }
+//
+//         // Calculate the minimum move distance to avoid overlap, assuming rightward movement
+//         let overlapAmount = (bulletNode.size.width / 2) + (objectNode.size.width / 2) + 5 // 5 is a buffer distance
+//
+//         // Move bullet to the right of the object
+//         bulletNode.position.x = objectNode.position.x + overlapAmount
+//
+//         // Ensure bullet doesn't move outside the bounds of the scene
+//         bulletNode.position.x = min(bulletNode.position.x, self.size.width - bulletNode.size.width / 2)
+//     }
+        
         // character coin contact logic
         var coinBody : SKPhysicsBody?
         if contact.bodyA.categoryBitMask == PhysicsCategory.coin && contact.bodyB.categoryBitMask == PhysicsCategory.character {
@@ -111,7 +139,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             bombBody = contact.bodyB
         }
         
-        if let bombNode = bombBody?.node as? SKSpriteNode, let index = bombsArray.firstIndex(of: bombNode) {
+        if let bombNode = bombBody?.node as? SKSpriteNode {
+            // when adding more bombs in the logic then create index
             
             let gameover = SKLabelNode(text: "Game Over")
             gameover.position = CGPoint(x: self.frame.midX, y: self.frame.midY)
@@ -200,7 +229,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         for _ in 0...bulletCount {
             let bullet = SKSpriteNode(imageNamed: "bullet")
             bullet.size = CGSize(width: 50, height: 50)
-            bullet.physicsBody = SKPhysicsBody(rectangleOf: bullet.size)
+            bullet.physicsBody = SKPhysicsBody(rectangleOf: CGSize(width: bullet.frame.width / 1.7, height: bullet.frame.height / 1.4))
             bullet.physicsBody?.isDynamic = false
             bullet.physicsBody?.categoryBitMask = PhysicsCategory.bullet
             bullet.physicsBody?.contactTestBitMask = PhysicsCategory.character
@@ -217,8 +246,16 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                 bullet.removeFromParent()
             }
             
-            let randomX = CGFloat.random(in: 1...self.frame.width - 80)
-            let randomY = CGFloat.random(in: 1...self.frame.height - 80)
+            var randomX: CGFloat = 0
+            var randomY: CGFloat = 0
+            let safeZoneRadius: CGFloat = 100
+
+            // repeat until bomb is not spawned on character
+            repeat {
+                randomX = CGFloat.random(in: 1...(self.frame.width - 80))
+                randomY = CGFloat.random(in: 1...(self.frame.height - 80))
+            } while sqrt(pow(randomX - frame.midX, 2) + pow(randomY - frame.midY, 2)) < safeZoneRadius
+
             bullet.position = CGPoint(x: randomX, y: randomY)
             addChild(bullet)
         }
@@ -230,7 +267,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         for _ in 0...coinCount {
             let coin = SKSpriteNode(imageNamed: "coin")
             coin.size = CGSize(width: 50, height: 50)
-            coin.physicsBody = SKPhysicsBody(rectangleOf: coin.size)
+            coin.physicsBody = SKPhysicsBody(circleOfRadius: coin.frame.height / 2.5)
             coin.physicsBody?.isDynamic = false
             coin.physicsBody?.categoryBitMask = PhysicsCategory.coin
             coin.physicsBody?.contactTestBitMask = PhysicsCategory.character
@@ -247,8 +284,16 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                 coin.removeFromParent()
             }
             
-            let randomX = CGFloat.random(in: 1...self.frame.width - 80)
-            let randomY = CGFloat.random(in: 1...self.frame.height - 80)
+            var randomX: CGFloat = 0
+            var randomY: CGFloat = 0
+            let safeZoneRadius: CGFloat = 100
+
+            // repeat until coin is not spawned on character
+            repeat {
+                randomX = CGFloat.random(in: 1...(self.frame.width - 80))
+                randomY = CGFloat.random(in: 1...(self.frame.height - 80))
+            } while sqrt(pow(randomX - frame.midX, 2) + pow(randomY - frame.midY, 2)) < safeZoneRadius
+
             coin.position = CGPoint(x: randomX, y: randomY)
             addChild(coin)
         }
@@ -260,7 +305,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         for _ in 0...bombCount {
             let bomb = SKSpriteNode(imageNamed: "bomb")
             bomb.size = CGSize(width: 50, height: 50)
-            bomb.physicsBody = SKPhysicsBody(rectangleOf: bomb.size)
+            bomb.physicsBody = SKPhysicsBody(circleOfRadius: bomb.frame.height / 2.5)
             bomb.physicsBody?.isDynamic = false
             bomb.physicsBody?.categoryBitMask = PhysicsCategory.bomb
             bomb.physicsBody?.contactTestBitMask = PhysicsCategory.character
@@ -277,8 +322,16 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                 bomb.removeFromParent()
             }
             
-            let randomX = CGFloat.random(in: 1...self.frame.width - 80)
-            let randomY = CGFloat.random(in: 1...self.frame.height - 80)
+            var randomX: CGFloat = 0
+            var randomY: CGFloat = 0
+            let safeZoneRadius: CGFloat = 100
+
+            // repeat until bomb is not spawned on character
+            repeat {
+                randomX = CGFloat.random(in: 1...(self.frame.width - 80))
+                randomY = CGFloat.random(in: 1...(self.frame.height - 80))
+            } while sqrt(pow(randomX - frame.midX, 2) + pow(randomY - frame.midY, 2)) < safeZoneRadius
+
             bomb.position = CGPoint(x: randomX, y: randomY)
             addChild(bomb)
         }

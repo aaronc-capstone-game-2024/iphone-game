@@ -22,8 +22,8 @@ class MenuScene: SKScene {
     }
     
     func addLogo() {
-        let logo = SKSpriteNode(imageNamed: "game sign")
-        logo.size = CGSize(width: frame.width/2, height: frame.height/4)
+        let logo = SKSpriteNode(imageNamed: "masorchi")
+        logo.size = CGSize(width: (frame.width/2) * 1.5, height: (frame.height/4) * 1.5)
         logo.position = CGPoint(x: frame.midX, y: frame.midY + frame.size.height/4)
         logo.zPosition = 1
         addChild(logo)
@@ -37,19 +37,19 @@ class MenuScene: SKScene {
         playLabel.zPosition = 1
         addChild(playLabel)
         
-        let highscore = SKLabelNode(text: "Highscore: \(GameManager.shared.highscore)")
+        let highscore = SKLabelNode(text: "Highscore: \(UserDefaults.standard.integer(forKey: "highscore"))")
         highscore.position = CGPoint(x: frame.midX, y: frame.midY - highscore.frame.size.height*4)
         highscore.fontColor = .black
         highscore.fontName = "AvenirNext-Bold"
         highscore.zPosition = 1
         addChild(highscore)
         
-        let recentScore = SKLabelNode(text: "Recent Score: \(GameManager.shared.score)")
-        recentScore.position = CGPoint(x: frame.midX, y: frame.midY - recentScore.frame.size.height*2)
-        recentScore.fontColor = .black
-        recentScore.fontName = "AvenirNext-Bold"
-        recentScore.zPosition = 1
-        addChild(recentScore)
+//        let recentScore = SKLabelNode(text: "Recent Score: \(GameManager.shared.score)")
+//        recentScore.position = CGPoint(x: frame.midX, y: frame.midY - recentScore.frame.size.height*2)
+//        recentScore.fontColor = .black
+//        recentScore.fontName = "AvenirNext-Bold"
+//        recentScore.zPosition = 1
+//        addChild(recentScore)
     }
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {

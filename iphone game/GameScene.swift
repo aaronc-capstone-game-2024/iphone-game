@@ -31,6 +31,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     var bulletsArray = [SKSpriteNode()]
     var coinsArray = [SKSpriteNode()]
     var bombsArray = [SKSpriteNode()]
+    var frames: [SKTexture] = []
     var labelClicks = SKLabelNode(fontNamed: "AvenirNext-Bold")
     var scoreLabel = SKLabelNode(text: "Score: \(GameManager.shared.score)")
     var coinLabel = SKLabelNode(text: "0")
@@ -54,7 +55,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     ]
     
     func positionOverlaps(_ newPosition: CGPoint) -> Bool {
-        let safeZoneRadius: CGFloat = 50 // adjust radius as necessary
+        let safeZoneRadius: CGFloat = 50 
 
         for (_, positions) in itemPosition {
             for position in positions {
@@ -70,7 +71,20 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         self.physicsWorld.contactDelegate = self
         self.physicsWorld.gravity = CGVector(dx: 0.0, dy: -2.0)
         
-        character = SKSpriteNode(imageNamed: "monster")
+        let background = SKSpriteNode(imageNamed: "blueSky")
+        background.position = CGPoint(x: self.frame.midX, y: self.frame.midY)
+        background.size = self.frame.size
+        background.zPosition = 1
+        self.addChild(background)
+        
+        let textureAtlas = SKTextureAtlas(named: "boom")
+        let numImages = textureAtlas.textureNames.count
+        for i in 1...numImages {
+            let texture = "Explosion-\(i)"
+            frames.append(textureAtlas.textureNamed(texture))
+        }
+        
+        character = SKSpriteNode(imageNamed: "monster1")
         character.size = CGSize(width: 80, height: 90)
         character.position = CGPoint(x: frame.midX, y: frame.midY)
         character.physicsBody = SKPhysicsBody(circleOfRadius: character.frame.height / 2.35)
@@ -79,11 +93,14 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         character.physicsBody?.contactTestBitMask = PhysicsCategory.bullet
         character.physicsBody?.affectedByGravity = false
         character.physicsBody?.isDynamic = true
+        character.zPosition = 2
         self.addChild(character)
         
         tapLabel.fontSize = 100
+        tapLabel.fontName = "Optima-ExtraBlack"
         tapLabel.position = CGPoint(x: frame.midX, y: frame.midY + 100)
-        tapLabel.color = UIColor(white: 1.0, alpha: 0.5)
+        tapLabel.fontColor = UIColor(red: 0.0, green: 0.0, blue: 0.0, alpha: 0.7)
+        tapLabel.zPosition = 2
         addChild(tapLabel)
                 
         createBullets()
@@ -163,24 +180,20 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         }
         
         if bombBody?.node is SKSpriteNode {
-            // when adding more bombs in the logic then create index
+            gameOver()
             
-            let gameover = SKLabelNode(text: "Game Over")
-            gameover.position = CGPoint(x: self.frame.midX, y: self.frame.midY)
-            addChild(gameover)
-            character.physicsBody?.velocity = CGVector(dx: 0, dy: 0)
-            character.physicsBody?.affectedByGravity = false
-            isUserInteractionEnabled = false
-            
-            let wait = SKAction.wait(forDuration: 1.5)
-            let transition = SKAction.run {
-                self.switchScene()
-            }
-            self.run(SKAction.sequence([wait, transition]))
-            if GameManager.shared.score > GameManager.shared.highscore {
-                GameManager.shared.highscore = GameManager.shared.score
+            if GameManager.shared.score > UserDefaults.standard.integer(forKey: "highscore") {
+                UserDefaults.standard.set(GameManager.shared.score, forKey: "highscore")
             }
             GameManager.shared.score = 0
+            
+            let animation = SKAction.animate(with: frames, timePerFrame: 0.3)
+            let sprite = SKSpriteNode(texture: frames.first)
+            sprite.position = CGPoint(x: character.position.x, y: character.position.y)
+            sprite.size = CGSize(width: character.size.width * 2.2, height: character.size.height * 2.2)
+            sprite.zPosition = 3
+            addChild(sprite)
+            sprite.run(SKAction.repeat(animation, count: 3))
         }
     }
     
@@ -233,18 +246,10 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             character.position.y = 10.0
         }
         if character.position.y < -20.0 {
-            let gameover = SKLabelNode(text: "Game Over")
-            gameover.position = CGPoint(x: self.frame.midX, y: self.frame.midY)
-            addChild(gameover)
-            character.physicsBody?.velocity = CGVector(dx: 0, dy: 0)
+            gameOver()
             
-            let wait = SKAction.wait(forDuration: 1.5)
-            let transition = SKAction.run {
-                self.switchScene()
-            }
-            self.run(SKAction.sequence([wait, transition]))
-            if GameManager.shared.score > GameManager.shared.highscore {
-                GameManager.shared.highscore = GameManager.shared.score
+            if GameManager.shared.score > UserDefaults.standard.integer(forKey: "highscore") {
+                UserDefaults.standard.set(GameManager.shared.score, forKey: "highscore")
             }
             GameManager.shared.score = 0
         }
@@ -254,6 +259,23 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             self.isUserInteractionEnabled = false
         }
         
+    }
+    
+    func gameOver() {
+        let gameover = SKSpriteNode(imageNamed: "gameover")
+        gameover.position = CGPoint(x: self.frame.midX, y: self.frame.midY)
+        gameover.size = CGSize(width: frame.width/2, height: frame.height/4)
+        gameover.zPosition = 5
+        addChild(gameover)
+        character.physicsBody?.velocity = CGVector(dx: 0, dy: 0)
+        character.physicsBody?.affectedByGravity = false
+        self.isUserInteractionEnabled = false
+        
+        let wait = SKAction.wait(forDuration: 1.5)
+        let transition = SKAction.run {
+            self.switchScene()
+        }
+        self.run(SKAction.sequence([wait, transition]))
     }
     
     func createBullets() {
@@ -268,6 +290,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             bullet.physicsBody?.categoryBitMask = PhysicsCategory.bullet
             bullet.physicsBody?.contactTestBitMask = PhysicsCategory.character | PhysicsCategory.bomb
             bullet.physicsBody?.collisionBitMask = 0
+            bullet.zPosition = 3
             bulletsArray.append(bullet)
         }
         
@@ -283,8 +306,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             var newBulletPosition: CGPoint
             repeat {
                 newBulletPosition = CGPoint(
-                    x: CGFloat.random(in: 0..<self.frame.width - 50),
-                    y: CGFloat.random(in: 0..<self.frame.height - 50)
+                    x: CGFloat.random(in: 0..<self.frame.width - 80),
+                    y: CGFloat.random(in: 0..<self.frame.height - 80)
                 )
             } while positionOverlaps(newBulletPosition)
 
@@ -306,6 +329,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             coin.physicsBody?.categoryBitMask = PhysicsCategory.coin
             coin.physicsBody?.contactTestBitMask = PhysicsCategory.character | PhysicsCategory.bomb
             coin.physicsBody?.collisionBitMask = 0
+            coin.zPosition = 3
             coinsArray.append(coin)
         }
         
@@ -321,8 +345,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             var newCoinPosition: CGPoint
             repeat {
                 newCoinPosition = CGPoint(
-                    x: CGFloat.random(in: 0..<self.frame.width - 50),
-                    y: CGFloat.random(in: 0..<self.frame.height - 50)
+                    x: CGFloat.random(in: 0..<self.frame.width - 80),
+                    y: CGFloat.random(in: 0..<self.frame.height - 80)
                 )
             } while positionOverlaps(newCoinPosition)
 
@@ -344,6 +368,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             bomb.physicsBody?.categoryBitMask = PhysicsCategory.bomb
             bomb.physicsBody?.contactTestBitMask = PhysicsCategory.character
             bomb.physicsBody?.collisionBitMask = 0
+            bomb.zPosition = 3
             bombsArray.append(bomb)
         }
         
@@ -357,12 +382,17 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             }
             
             var newBombPosition: CGPoint
+            let safeZoneRadius: CGFloat = 100
+            var randomX: CGFloat = 0
+            var randomY: CGFloat = 0
             repeat {
+                randomX = CGFloat.random(in: 1...(self.frame.width - 100))
+                randomY = CGFloat.random(in: 1...(self.frame.width - 100))
                 newBombPosition = CGPoint(
-                    x: CGFloat.random(in: 0..<self.frame.width - 30),
-                    y: CGFloat.random(in: 0..<self.frame.height - 50)
+                    x: randomX,
+                    y: randomY
                 )
-            } while positionOverlaps(newBombPosition)
+            } while positionOverlaps(newBombPosition) &&  sqrt(pow(randomX - frame.midX, 2) + pow(randomY - frame.midY, 2)) < safeZoneRadius
 
             bomb.position = newBombPosition
             itemPosition["bombs"]?.append(newBombPosition)
@@ -377,9 +407,11 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     
     func displayClick() {
         labelClicks.text = "\(clicks)"
-        labelClicks.fontColor = UIColor(displayP3Red: 30.0, green: 12.1, blue: 102.3, alpha: 0.5)
+        labelClicks.fontColor = UIColor(red: 0.0, green: 0.0, blue: 0.0, alpha: 0.7)
         labelClicks.fontSize = 100
+        labelClicks.fontName = "Optima-ExtraBlack"
         labelClicks.position = CGPoint(x: frame.midX, y: frame.midY + frame.size.height/4)
+        labelClicks.zPosition = 2
         addChild(labelClicks)
     }
     
@@ -390,13 +422,20 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     func scoreCoinLabels() {
         scoreLabel.position = CGPoint(x: self.frame.midX - 130, y: self.frame.size.height - 100)
         scoreLabel.fontSize = 25
+        scoreLabel.zPosition = 3
+        scoreLabel.fontName = "Optima-ExtraBlack"
+        scoreLabel.fontColor = UIColor(red: 0.0, green: 0.0, blue: 0.0, alpha: 1.0)
         addChild(scoreLabel)
         
         coinLabel.position = CGPoint(x: self.frame.midX + 130, y: self.frame.size.height - 100)
         coinLabel.fontSize = 25
+        coinLabel.zPosition = 3
+        coinLabel.fontName = "Optima-ExtraBlack"
+        coinLabel.fontColor = UIColor(red: 0.0, green: 0.0, blue: 0.0, alpha: 1.0)
         let coinImage = SKSpriteNode(imageNamed: "coin")
         coinImage.size = CGSize(width: 35, height: 35)
         coinImage.position =  CGPoint(x: coinLabel.frame.minX - coinImage.size.width / 2 - 10, y: coinLabel.frame.midY)
+        coinImage.zPosition = 3
         addChild(coinLabel)
         addChild(coinImage)
     }

@@ -10,6 +10,7 @@ import SpriteKit
 
 
 class MenuScene: SKScene {
+    let instructionLabel = SKLabelNode(text: "Instructions")
 
     override func didMove(to view: SKView) {
            let background = SKSpriteNode(imageNamed: "blueSky")
@@ -19,6 +20,7 @@ class MenuScene: SKScene {
         
         addLogo()
         addLabels()
+        instructions()
     }
     
     func addLogo() {
@@ -33,28 +35,38 @@ class MenuScene: SKScene {
         let playLabel = SKLabelNode(text: "Tap to Play")
         playLabel.position = CGPoint(x: frame.midX, y: frame.midY)
         playLabel.fontColor = .black
-        playLabel.fontName = "AvenirNext-Bold"
+        playLabel.fontName = "Optima-ExtraBlack"
         playLabel.zPosition = 1
         addChild(playLabel)
         
         let highscore = SKLabelNode(text: "Highscore: \(UserDefaults.standard.integer(forKey: "highscore"))")
         highscore.position = CGPoint(x: frame.midX, y: frame.midY - highscore.frame.size.height*4)
         highscore.fontColor = .black
-        highscore.fontName = "AvenirNext-Bold"
+        highscore.fontName = "Optima-ExtraBlack"
         highscore.zPosition = 1
         addChild(highscore)
-        
-//        let recentScore = SKLabelNode(text: "Recent Score: \(GameManager.shared.score)")
-//        recentScore.position = CGPoint(x: frame.midX, y: frame.midY - recentScore.frame.size.height*2)
-//        recentScore.fontColor = .black
-//        recentScore.fontName = "AvenirNext-Bold"
-//        recentScore.zPosition = 1
-//        addChild(recentScore)
+    }
+    
+    func instructions() {
+        instructionLabel.position = CGPoint(x: frame.midX, y: frame.minY + 100)
+        instructionLabel.fontColor = .black
+        instructionLabel.fontName = "Optima-ExtraBlack"
+        instructionLabel.zPosition = 1
+        addChild(instructionLabel)
     }
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
-        let gameScene = GameScene(size: CGSize(width: self.frame.width, height: self.frame.height))
-        gameScene.scaleMode = .aspectFill
-        view!.presentScene(gameScene)
+        if let touch = touches.first {
+            let touchLocation = touch.location(in: self)
+            
+            if instructionLabel.frame.contains(touchLocation) {
+                let scene = Tutorial(size: CGSize(width: self.frame.width, height: self.frame.height))
+                view!.presentScene(scene)
+            } else {
+                let gameScene = GameScene(size: CGSize(width: self.frame.width, height: self.frame.height))
+                gameScene.scaleMode = .aspectFill
+                view!.presentScene(gameScene)
+            }
+        }
     }
 }

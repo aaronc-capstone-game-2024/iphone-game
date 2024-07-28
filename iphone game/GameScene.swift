@@ -203,11 +203,11 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             character.physicsBody?.affectedByGravity = true
             if let touch = touches.first {
                 let touchLocation = touch.location(in: self)
-                let monsterPosition = character.position
+                let characterPosition = character.position
                 
                 // Calculate vector from monster to touch location
-                let dx = touchLocation.x - monsterPosition.x
-                let dy = touchLocation.y - monsterPosition.y
+                let dx = touchLocation.x - characterPosition.x
+                let dy = touchLocation.y - characterPosition.y
                 let vector = CGVector(dx: dx, dy: dy)
                 
                 // Normalize the vector to get direction

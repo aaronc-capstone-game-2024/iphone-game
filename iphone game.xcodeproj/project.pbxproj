@@ -15,6 +15,7 @@
 		97672AF02C3EE958002F6616 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 97672AEF2C3EE958002F6616 /* Assets.xcassets */; };
 		97672AF32C3EE958002F6616 /* Base in Resources */ = {isa = PBXBuildFile; fileRef = 97672AF22C3EE958002F6616 /* Base */; };
 		97C737972C46E90C001AEEF1 /* MenuScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 97C737962C46E90C001AEEF1 /* MenuScene.swift */; };
+		97D650DB2C5531A20019B5FD /* Tutorial.swift in Sources */ = {isa = PBXBuildFile; fileRef = 97D650DA2C5531A20019B5FD /* Tutorial.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -27,6 +28,7 @@
 		97672AEF2C3EE958002F6616 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		97672AF22C3EE958002F6616 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		97C737962C46E90C001AEEF1 /* MenuScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuScene.swift; sourceTree = "<group>"; };
+		97D650DA2C5531A20019B5FD /* Tutorial.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tutorial.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -64,6 +66,7 @@
 				97672AEA2C3EE954002F6616 /* GameViewController.swift */,
 				97C737962C46E90C001AEEF1 /* MenuScene.swift */,
 				97518D822C51546F00B6BBF3 /* GameManager.swift */,
+				97D650DA2C5531A20019B5FD /* Tutorial.swift */,
 				97672AEC2C3EE954002F6616 /* Main.storyboard */,
 				97672AEF2C3EE958002F6616 /* Assets.xcassets */,
 				97672AF12C3EE958002F6616 /* LaunchScreen.storyboard */,
@@ -143,6 +146,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				97672AE92C3EE954002F6616 /* GameScene.swift in Sources */,
+				97D650DB2C5531A20019B5FD /* Tutorial.swift in Sources */,
 				97C737972C46E90C001AEEF1 /* MenuScene.swift in Sources */,
 				97672AEB2C3EE954002F6616 /* GameViewController.swift in Sources */,
 				97672AE32C3EE954002F6616 /* AppDelegate.swift in Sources */,

@@ -11,12 +11,33 @@ import SpriteKit
 
 class MenuScene: SKScene {
     let instructionLabel = SKLabelNode(text: "Instructions")
+//    var currSkin = 0
 
     override func didMove(to view: SKView) {
-           let background = SKSpriteNode(imageNamed: "blueSky")
-           background.position = CGPoint(x: self.frame.midX, y: self.frame.midY)
-           background.size = self.frame.size
-           self.addChild(background)
+        // background
+        let background = SKSpriteNode(imageNamed: GameManager.shared.backgrounds[GameManager.shared.currBack])
+        background.position = CGPoint(x: self.frame.midX, y: self.frame.midY)
+        background.size = self.frame.size
+        self.addChild(background)
+        
+        // add character
+        let character = SKSpriteNode(imageNamed: GameManager.shared.skins[GameManager.shared.currSkin])
+        character.position = CGPoint(x: frame.midX, y: frame.midY)
+        character.zPosition = 1
+        character.size = CGSize(width: 90, height: 100)
+        addChild(character)
+        
+        //animate character
+        let animation = SKAction.move(by: CGVector(dx: 0, dy: 10), duration: 1)
+        let sequence = SKAction.sequence([animation, animation.reversed()])
+        character.run(SKAction.repeatForever(sequence))
+        
+        // add arrows
+        let rightArrow = SKSpriteNode(imageNamed: "next")
+        rightArrow.position = CGPoint(x: character.position.x + 100, y: frame.midY)
+        rightArrow.size = CGSize(width: 45, height: 50)
+        rightArrow.zPosition = 1
+        addChild(rightArrow)
         
         addLogo()
         addLabels()
@@ -26,21 +47,21 @@ class MenuScene: SKScene {
     func addLogo() {
         let logo = SKSpriteNode(imageNamed: "masorchi")
         logo.size = CGSize(width: (frame.width/2) * 1.5, height: (frame.height/4) * 1.5)
-        logo.position = CGPoint(x: frame.midX, y: frame.midY + frame.size.height/4)
+        logo.position = CGPoint(x: frame.midX, y: frame.maxY - 200)
         logo.zPosition = 1
         addChild(logo)
     }
     
     func addLabels() {
         let playLabel = SKLabelNode(text: "Tap to Play")
-        playLabel.position = CGPoint(x: frame.midX, y: frame.midY)
+        playLabel.position = CGPoint(x: frame.midX, y: frame.minY + 220)
         playLabel.fontColor = .black
         playLabel.fontName = "Optima-ExtraBlack"
         playLabel.zPosition = 1
         addChild(playLabel)
         
         let highscore = SKLabelNode(text: "Highscore: \(UserDefaults.standard.integer(forKey: "highscore"))")
-        highscore.position = CGPoint(x: frame.midX, y: frame.midY - highscore.frame.size.height*4)
+        highscore.position = CGPoint(x: frame.midX, y: frame.minY + 160)
         highscore.fontColor = .black
         highscore.fontName = "Optima-ExtraBlack"
         highscore.zPosition = 1

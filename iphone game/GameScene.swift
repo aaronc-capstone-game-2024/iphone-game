@@ -71,7 +71,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         self.physicsWorld.contactDelegate = self
         self.physicsWorld.gravity = CGVector(dx: 0.0, dy: -2.0)
         
-        let background = SKSpriteNode(imageNamed: "blueSky")
+        let background = SKSpriteNode(imageNamed: GameManager.shared.backgrounds[GameManager.shared.currBack])
         background.position = CGPoint(x: self.frame.midX, y: self.frame.midY)
         background.size = self.frame.size
         background.zPosition = 1
@@ -84,7 +84,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             frames.append(textureAtlas.textureNamed(texture))
         }
         
-        character = SKSpriteNode(imageNamed: "monster1")
+        character = SKSpriteNode(imageNamed: GameManager.shared.skins[GameManager.shared.currSkin])
         character.size = CGSize(width: 80, height: 90)
         character.position = CGPoint(x: frame.midX, y: frame.midY)
         character.physicsBody = SKPhysicsBody(circleOfRadius: character.frame.height / 2.35)

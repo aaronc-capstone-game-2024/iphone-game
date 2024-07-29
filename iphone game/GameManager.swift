@@ -15,6 +15,8 @@ class GameManager {
     
     var score: Int = 0
     var highscore: Int = 0
-    var skins = [SKSpriteNode()]
-    var backgrounds = [SKSpriteNode()]
+    var skins = ["monster1"]
+    var backgrounds = ["blueSky"]
+    var currSkin = 0
+    var currBack = 0
 }

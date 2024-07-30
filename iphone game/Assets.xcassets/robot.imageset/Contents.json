@@ -1,11 +1,11 @@
 {
   "images" : [
     {
+      "filename" : "robot-removebg-preview.png",
       "idiom" : "universal",
       "scale" : "1x"
     },
     {
-      "filename" : "wood@2x.png",
       "idiom" : "universal",
       "scale" : "2x"
     },

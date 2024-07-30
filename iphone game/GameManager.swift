@@ -15,8 +15,8 @@ class GameManager {
     
     var score: Int = 0
     var highscore: Int = 0
-    var skins = ["monster1"]
-    var backgrounds = ["blueSky"]
+    var skins = ["monster", "robot", "cowboy", "cat"]
+    var backgrounds = ["blueSky", "purple city", "hell", "space"]
     var currSkin = 0
     var currBack = 0
 }

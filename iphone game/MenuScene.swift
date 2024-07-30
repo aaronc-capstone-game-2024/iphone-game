@@ -10,7 +10,10 @@ import SpriteKit
 
 
 class MenuScene: SKScene {
+    let playLabel = SKLabelNode(text: "Tap to Play")
     let instructionLabel = SKLabelNode(text: "Instructions")
+    var character = SKSpriteNode(imageNamed: GameManager.shared.skins[GameManager.shared.currSkin])
+    var background = SKSpriteNode(imageNamed: GameManager.shared.backgrounds[GameManager.shared.currBack])
     let rightArrow = SKSpriteNode(imageNamed: "next1")
     let leftArrow = SKSpriteNode(imageNamed: "next1")
     let upArrow = SKSpriteNode(imageNamed: "next1")
@@ -18,13 +21,11 @@ class MenuScene: SKScene {
 
     override func didMove(to view: SKView) {
         // background
-        let background = SKSpriteNode(imageNamed: GameManager.shared.backgrounds[GameManager.shared.currBack])
         background.position = CGPoint(x: self.frame.midX, y: self.frame.midY)
         background.size = self.frame.size
         self.addChild(background)
         
         // add character
-        let character = SKSpriteNode(imageNamed: GameManager.shared.skins[GameManager.shared.currSkin])
         character.position = CGPoint(x: frame.midX, y: frame.midY)
         character.zPosition = 1
         character.size = CGSize(width: 90, height: 100)
@@ -73,7 +74,6 @@ class MenuScene: SKScene {
     }
     
     func addLabels() {
-        let playLabel = SKLabelNode(text: "Tap to Play")
         playLabel.position = CGPoint(x: frame.midX, y: frame.minY + 220)
         playLabel.fontColor = .black
         playLabel.fontName = "Optima-ExtraBlack"
@@ -96,18 +96,66 @@ class MenuScene: SKScene {
         addChild(instructionLabel)
     }
     
+    override func update(_ currentTime: TimeInterval) {
+        updateSkin()
+    }
+    
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         if let touch = touches.first {
             let touchLocation = touch.location(in: self)
             
+            if rightArrow.frame.contains(touchLocation) {
+                GameManager.shared.currSkin += 1
+                if GameManager.shared.currSkin == GameManager.shared.skins.count {
+                    GameManager.shared.currSkin = 0
+                }
+                updateSkin()
+            }
+            
+            if upArrow.frame.contains(touchLocation) {
+                GameManager.shared.currBack += 1
+                if GameManager.shared.currBack == GameManager.shared.backgrounds.count {
+                    GameManager.shared.currBack = 0
+                }
+                updateBack()
+            }
+            
+            if leftArrow.frame.contains(touchLocation) {
+                GameManager.shared.currSkin -= 1
+                if GameManager.shared.currSkin == -1 {
+                    GameManager.shared.currSkin = GameManager.shared.skins.count - 1
+                }
+                updateSkin()
+            }
+            
+            if downArrow.frame.contains(touchLocation) {
+                GameManager.shared.currBack -= 1
+                if GameManager.shared.currBack == -1 {
+                    GameManager.shared.currBack = GameManager.shared.backgrounds.count - 1
+                }
+                updateBack()
+            }
+            
             if instructionLabel.frame.contains(touchLocation) {
                 let scene = Tutorial(size: CGSize(width: self.frame.width, height: self.frame.height))
                 view!.presentScene(scene)
-            } else {
+            }
+            
+            if playLabel.frame.contains(touchLocation) {
                 let gameScene = GameScene(size: CGSize(width: self.frame.width, height: self.frame.height))
                 gameScene.scaleMode = .aspectFill
                 view!.presentScene(gameScene)
             }
         }
+    }
+    
+    func updateSkin() {
+        let newTexture = SKTexture(imageNamed: GameManager.shared.skins[GameManager.shared.currSkin])
+        character.texture = newTexture
+    }
+    
+    func updateBack() {
+        let newTexture = SKTexture(imageNamed: GameManager.shared.backgrounds[GameManager.shared.currBack])
+        background.texture = newTexture
     }
 }

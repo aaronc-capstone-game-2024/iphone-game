@@ -11,7 +11,10 @@ import SpriteKit
 
 class MenuScene: SKScene {
     let instructionLabel = SKLabelNode(text: "Instructions")
-//    var currSkin = 0
+    let rightArrow = SKSpriteNode(imageNamed: "next1")
+    let leftArrow = SKSpriteNode(imageNamed: "next1")
+    let upArrow = SKSpriteNode(imageNamed: "next1")
+    let downArrow = SKSpriteNode(imageNamed: "next1")
 
     override func didMove(to view: SKView) {
         // background
@@ -33,11 +36,28 @@ class MenuScene: SKScene {
         character.run(SKAction.repeatForever(sequence))
         
         // add arrows
-        let rightArrow = SKSpriteNode(imageNamed: "next")
         rightArrow.position = CGPoint(x: character.position.x + 100, y: frame.midY)
-        rightArrow.size = CGSize(width: 45, height: 50)
+        rightArrow.size = CGSize(width: 35, height: 40)
         rightArrow.zPosition = 1
         addChild(rightArrow)
+        
+        leftArrow.position = CGPoint(x: character.position.x - 100, y: frame.midY)
+        leftArrow.size = CGSize(width: 35, height: 40)
+        leftArrow.zPosition = 1
+        leftArrow.zRotation = .pi
+        addChild(leftArrow)
+        
+        upArrow.position = CGPoint(x: frame.midX, y: frame.midY + 100)
+        upArrow.size = CGSize(width: 35, height: 40)
+        upArrow.zPosition = 1
+        upArrow.zRotation = .pi / 2
+        addChild(upArrow)
+        
+        downArrow.position = CGPoint(x: frame.midX, y: frame.midY - 100)
+        downArrow.size = CGSize(width: 35, height: 40)
+        downArrow.zPosition = 1
+        downArrow.zRotation = .pi / -2
+        addChild(downArrow)
         
         addLogo()
         addLabels()

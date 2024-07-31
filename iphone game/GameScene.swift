@@ -259,6 +259,18 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             self.isUserInteractionEnabled = false
         }
         
+        if GameManager.shared.currBack != 0 {
+            scoreLabel.fontColor = .white
+            tapLabel.fontColor = .white
+            coinLabel.fontColor = .white
+            labelClicks.fontColor = .white
+        } else {
+            scoreLabel.fontColor = .black
+            tapLabel.fontColor = .black
+            coinLabel.fontColor = .black
+            labelClicks.fontColor = .black
+        }
+        
     }
     
     func gameOver() {
@@ -361,8 +373,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         bombsArray.removeAll()
         
         for _ in 0...bombCount {
-            let bomb = SKSpriteNode(imageNamed: "bomb")
-            bomb.size = CGSize(width: 50, height: 50)
+            let bomb = SKSpriteNode(imageNamed: "bomb1")
+            bomb.size = CGSize(width: 70, height: 70)
             bomb.physicsBody = SKPhysicsBody(circleOfRadius: bomb.frame.height / 2.5)
             bomb.physicsBody?.isDynamic = false
             bomb.physicsBody?.categoryBitMask = PhysicsCategory.bomb
@@ -433,7 +445,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         coinLabel.fontName = "Optima-ExtraBlack"
         coinLabel.fontColor = UIColor(red: 0.0, green: 0.0, blue: 0.0, alpha: 1.0)
         let coinImage = SKSpriteNode(imageNamed: "coin")
-        coinImage.size = CGSize(width: 35, height: 35)
+        coinImage.size = CGSize(width: 25, height: 25)
         coinImage.position =  CGPoint(x: coinLabel.frame.minX - coinImage.size.width / 2 - 10, y: coinLabel.frame.midY)
         coinImage.zPosition = 3
         addChild(coinLabel)

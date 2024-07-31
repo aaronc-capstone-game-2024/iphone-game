@@ -11,12 +11,27 @@ import SpriteKit
 class GameManager {
     static let shared = GameManager()
     
-    private init() {}
+    var currSkin: Int = UserDefaults.standard.integer(forKey: "skin") {
+        didSet {
+            UserDefaults.standard.set(currSkin, forKey: "skin")
+            UserDefaults.standard.synchronize()
+        }
+    }
+    
+    var currBack: Int = UserDefaults.standard.integer(forKey: "background") {
+        didSet {
+            UserDefaults.standard.set(currBack, forKey: "background")
+            UserDefaults.standard.synchronize()
+        }
+    }
     
     var score: Int = 0
     var highscore: Int = 0
     var skins = ["monster", "robot", "cowboy", "cat"]
     var backgrounds = ["blueSky", "purple city", "hell", "space"]
-    var currSkin = 0
-    var currBack = 0
+
+    private init() {
+        currSkin = UserDefaults.standard.integer(forKey: "skin")
+        currBack = UserDefaults.standard.integer(forKey: "background")
+    }
 }

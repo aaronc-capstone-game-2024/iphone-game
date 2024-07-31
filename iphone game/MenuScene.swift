@@ -7,13 +7,15 @@
 
 import SpriteKit
 
-
-
 class MenuScene: SKScene {
     let playLabel = SKLabelNode(text: "Tap to Play")
     let instructionLabel = SKLabelNode(text: "Instructions")
-    var character = SKSpriteNode(imageNamed: GameManager.shared.skins[GameManager.shared.currSkin])
-    var background = SKSpriteNode(imageNamed: GameManager.shared.backgrounds[GameManager.shared.currBack])
+    var character = SKSpriteNode(imageNamed: GameManager.shared.skins[UserDefaults.standard.integer(forKey: "skin")])
+    let highscore = SKLabelNode(text: "Highscore: \(UserDefaults.standard.integer(forKey: "highscore"))")
+    var background = SKSpriteNode(imageNamed: GameManager.shared.backgrounds[UserDefaults.standard.integer(forKey: "background")])
+    lazy var playLabelBackground = labelBackground(for: playLabel, color: .white)
+    lazy var highscoreBackground = labelBackground(for: highscore, color: .white)
+    lazy var instructionLabelBackground = labelBackground(for: instructionLabel, color: .white)
     let rightArrow = SKSpriteNode(imageNamed: "next1")
     let leftArrow = SKSpriteNode(imageNamed: "next1")
     let upArrow = SKSpriteNode(imageNamed: "next1")
@@ -36,6 +38,23 @@ class MenuScene: SKScene {
         let sequence = SKAction.sequence([animation, animation.reversed()])
         character.run(SKAction.repeatForever(sequence))
         
+        //animate arrows
+        let leftArrowanimation = SKAction.move(by: CGVector(dx: 10, dy: 0), duration: 1)
+        let leftArrowsequence = SKAction.sequence([leftArrowanimation, leftArrowanimation.reversed()])
+        leftArrow.run(SKAction.repeatForever(leftArrowsequence))
+        
+        let rightArrowanimation = SKAction.move(by: CGVector(dx: -10, dy: 0), duration: 1)
+        let rightArrowsequence = SKAction.sequence([rightArrowanimation, rightArrowanimation.reversed()])
+        rightArrow.run(SKAction.repeatForever(rightArrowsequence))
+        
+        let upArrowanimation = SKAction.move(by: CGVector(dx: 0, dy: -10), duration: 1)
+        let upArrowsequence = SKAction.sequence([upArrowanimation, upArrowanimation.reversed()])
+        upArrow.run(SKAction.repeatForever(upArrowsequence))
+        
+        let downArrowanimation = SKAction.move(by: CGVector(dx: 0, dy: 10), duration: 1)
+        let downArrowsequence = SKAction.sequence([downArrowanimation, downArrowanimation.reversed()])
+        downArrow.run(SKAction.repeatForever(downArrowsequence))
+        
         // add arrows
         rightArrow.position = CGPoint(x: character.position.x + 100, y: frame.midY)
         rightArrow.size = CGSize(width: 35, height: 40)
@@ -48,7 +67,7 @@ class MenuScene: SKScene {
         leftArrow.zRotation = .pi
         addChild(leftArrow)
         
-        upArrow.position = CGPoint(x: frame.midX, y: frame.midY + 100)
+        upArrow.position = CGPoint(x: frame.midX, y: frame.midY + 110)
         upArrow.size = CGSize(width: 35, height: 40)
         upArrow.zPosition = 1
         upArrow.zRotation = .pi / 2
@@ -62,7 +81,16 @@ class MenuScene: SKScene {
         
         addLogo()
         addLabels()
-        instructions()
+    }
+    
+    func labelBackground(for label: SKLabelNode, color: UIColor) -> SKShapeNode {
+        let padding: CGFloat = 10
+        let background = SKShapeNode(rectOf: CGSize(width: label.frame.width + padding * 2, height: label.frame.height + padding), cornerRadius: 10)
+        background.fillColor = color
+        background.strokeColor = .clear
+        background.position = CGPoint(x: label.position.x, y: label.position.y + padding)
+        background.zPosition = 2
+        return background
     }
     
     func addLogo() {
@@ -74,29 +102,50 @@ class MenuScene: SKScene {
     }
     
     func addLabels() {
+        // Play label
         playLabel.position = CGPoint(x: frame.midX, y: frame.minY + 220)
         playLabel.fontColor = .black
         playLabel.fontName = "Optima-ExtraBlack"
-        playLabel.zPosition = 1
-        addChild(playLabel)
+        playLabel.zPosition = 2
         
-        let highscore = SKLabelNode(text: "Highscore: \(UserDefaults.standard.integer(forKey: "highscore"))")
+        addChild(playLabelBackground)
+        addChild(playLabel)
+
+        // Highscore label
         highscore.position = CGPoint(x: frame.midX, y: frame.minY + 160)
         highscore.fontColor = .black
         highscore.fontName = "Optima-ExtraBlack"
-        highscore.zPosition = 1
+        highscore.zPosition = 2
+        
+        addChild(highscoreBackground)
         addChild(highscore)
-    }
-    
-    func instructions() {
+
+        // Instruction label
         instructionLabel.position = CGPoint(x: frame.midX, y: frame.minY + 100)
         instructionLabel.fontColor = .black
         instructionLabel.fontName = "Optima-ExtraBlack"
-        instructionLabel.zPosition = 1
+        instructionLabel.zPosition = 2
+        
+        addChild(instructionLabelBackground)
         addChild(instructionLabel)
     }
     
     override func update(_ currentTime: TimeInterval) {
+        if GameManager.shared.currBack != 0 {
+            playLabel.fontColor = .white
+            highscore.fontColor = .white
+            instructionLabel.fontColor = .white
+            playLabelBackground.fillColor = .black
+            highscoreBackground.fillColor = .black
+            instructionLabelBackground.fillColor = .black
+        } else {
+            playLabel.fontColor = .black
+            highscore.fontColor = .black
+            instructionLabel.fontColor = .black
+            playLabelBackground.fillColor = .white
+            highscoreBackground.fillColor = .white
+            instructionLabelBackground.fillColor = .white
+        }
         updateSkin()
     }
     
@@ -105,34 +154,22 @@ class MenuScene: SKScene {
             let touchLocation = touch.location(in: self)
             
             if rightArrow.frame.contains(touchLocation) {
-                GameManager.shared.currSkin += 1
-                if GameManager.shared.currSkin == GameManager.shared.skins.count {
-                    GameManager.shared.currSkin = 0
-                }
+                GameManager.shared.currSkin = (GameManager.shared.currSkin + 1) % GameManager.shared.skins.count
                 updateSkin()
             }
             
             if upArrow.frame.contains(touchLocation) {
-                GameManager.shared.currBack += 1
-                if GameManager.shared.currBack == GameManager.shared.backgrounds.count {
-                    GameManager.shared.currBack = 0
-                }
+                GameManager.shared.currBack = (GameManager.shared.currBack + 1) % GameManager.shared.backgrounds.count
                 updateBack()
             }
             
             if leftArrow.frame.contains(touchLocation) {
-                GameManager.shared.currSkin -= 1
-                if GameManager.shared.currSkin == -1 {
-                    GameManager.shared.currSkin = GameManager.shared.skins.count - 1
-                }
+                GameManager.shared.currSkin = (GameManager.shared.currSkin - 1 + GameManager.shared.skins.count) % GameManager.shared.skins.count
                 updateSkin()
             }
             
             if downArrow.frame.contains(touchLocation) {
-                GameManager.shared.currBack -= 1
-                if GameManager.shared.currBack == -1 {
-                    GameManager.shared.currBack = GameManager.shared.backgrounds.count - 1
-                }
+                GameManager.shared.currBack = (GameManager.shared.currBack - 1) % GameManager.shared.backgrounds.count
                 updateBack()
             }
             
@@ -150,12 +187,10 @@ class MenuScene: SKScene {
     }
     
     func updateSkin() {
-        let newTexture = SKTexture(imageNamed: GameManager.shared.skins[GameManager.shared.currSkin])
-        character.texture = newTexture
+        character.texture = SKTexture(imageNamed: GameManager.shared.skins[GameManager.shared.currSkin])
     }
     
     func updateBack() {
-        let newTexture = SKTexture(imageNamed: GameManager.shared.backgrounds[GameManager.shared.currBack])
-        background.texture = newTexture
+        background.texture = SKTexture(imageNamed: GameManager.shared.backgrounds[GameManager.shared.currBack])
     }
 }

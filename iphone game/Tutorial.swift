@@ -8,7 +8,7 @@
 import SpriteKit
 
 class Tutorial: SKScene {
-    let exit = SKLabelNode(text: "got it")
+    let exit = SKLabelNode(text: "Got it")
     
     func createMultilineLabel(text: String, maxWidth: CGFloat, lineHeight: CGFloat) -> SKNode {
             let words = text.components(separatedBy: " ")
@@ -19,14 +19,14 @@ class Tutorial: SKScene {
             for word in words {
                 let testLine = currentLine + (currentLine.isEmpty ? "" : " ") + word
                 let testLabel = SKLabelNode(text: testLine)
-                testLabel.fontSize = 14
+                testLabel.fontSize = 16
                 testLabel.fontName = "Optima-ExtraBlack"
                 testLabel.horizontalAlignmentMode = .center
                 testLabel.calculateAccumulatedFrame()
 
                 if testLabel.frame.size.width > maxWidth {
                     let lineLabel = SKLabelNode(text: currentLine)
-                    lineLabel.fontSize = 14
+                    lineLabel.fontSize = 16
                     lineLabel.fontName = "Optima-ExtraBlack"
                     lineLabel.horizontalAlignmentMode = .center
                     lineLabel.position = CGPoint(x: 0, y: -currentHeight)
@@ -40,7 +40,7 @@ class Tutorial: SKScene {
 
             if !currentLine.isEmpty {
                 let lineLabel = SKLabelNode(text: currentLine)
-                lineLabel.fontSize = 14
+                lineLabel.fontSize = 16
                 lineLabel.fontName = "Optima-ExtraBlack"
                 lineLabel.horizontalAlignmentMode = .center
                 lineLabel.position = CGPoint(x: 0, y: -currentHeight)
@@ -61,7 +61,7 @@ class Tutorial: SKScene {
         howToPlay.color = .white
         addChild(howToPlay)
         
-        let instructionText = "you start the game with 10 jumps, youre objective is to grab as many coins and bullets without falling off the bottom of the map or hitting a bomb."
+        let instructionText = "You start the game with 10 jumps, your objective is to grab as many coins and bullets as possible without falling off the bottom of the map or hitting a bomb."
         let instructions = createMultilineLabel(text: instructionText, maxWidth: maxWidth, lineHeight: 20)
         instructions.position =  CGPoint(x: frame.midX, y: frame.maxY - 150)
         addChild(instructions)
@@ -69,7 +69,7 @@ class Tutorial: SKScene {
         // item info
         let bulletText = SKLabelNode(text: "+1 jump & +2 points")
         let bulletImg = SKSpriteNode(imageNamed: "bullet")
-        bulletText.position = CGPoint(x: frame.midX, y: frame.maxY - 250)
+        bulletText.position = CGPoint(x: frame.midX, y: frame.maxY - 300)
         bulletText.fontSize = 18
         bulletText.fontName = "Optima-ExtraBlack"
         bulletImg.size = CGSize(width: 60, height: 60)
@@ -87,8 +87,8 @@ class Tutorial: SKScene {
         addChild(coinText)
         addChild(coinImg)
         
-        let bombText = SKLabelNode(text: "death")
-        let bombImg = SKSpriteNode(imageNamed: "bomb")
+        let bombText = SKLabelNode(text: "Death")
+        let bombImg = SKSpriteNode(imageNamed: "bomb1")
         bombText.position = CGPoint(x: frame.midX, y: coinText.position.y - 50)
         bombText.fontName = "Optima-ExtraBlack"
         bombText.fontSize = 18
@@ -101,19 +101,22 @@ class Tutorial: SKScene {
         let proTip = SKLabelNode(text: "Pro Tip")
         proTip.fontName = "Optima-ExtraBlack"
         proTip.fontSize = 20
-        proTip.position = CGPoint(x: frame.midX, y: bombText.position.y - 50)
+        proTip.position = CGPoint(x: frame.midX, y: bombText.position.y - 70)
         addChild(proTip)
-        let rotateText = "you can rotate horizontally around the screen to grab items and vertically rotate by jumping above the top of the screen"
+        let rotateText = "You can move horizontally across the screen to collect items and jump over the top of the screen to rotate vertically."
         let rotate = createMultilineLabel(text: rotateText, maxWidth: maxWidth, lineHeight: 20)
         rotate.position = CGPoint(x: frame.midX, y: proTip.position.y - 20)
         addChild(rotate)
         
         //explain the special
-        let special = SKLabelNode(text: "Special")
-        special.fontName = "Optima-ExtraBlack"
-        special.fontSize = 20
-        special.position = CGPoint(x: frame.midX, y: rotate.position.y - 80)
-        addChild(special)
+//        let special = SKLabelNode(text: "Special")
+//        special.fontName = "Optima-ExtraBlack"
+//        special.fontSize = 20
+//        special.position = CGPoint(x: frame.midX, y: rotate.position.y - 80)
+//        addChild(special)
+        let lastTip = createMultilineLabel(text: "Remember: 'Slow and steady wins the race' isn't just good advice—it's also your key to winning this game!", maxWidth: maxWidth, lineHeight: 20)
+        lastTip.position = CGPoint(x: frame.midX, y: rotate.position.y - 100)
+        addChild(lastTip)
         
         // got it button
         //change to button or image

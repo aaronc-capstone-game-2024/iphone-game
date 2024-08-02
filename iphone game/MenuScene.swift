@@ -156,21 +156,29 @@ class MenuScene: SKScene {
             if rightArrow.frame.contains(touchLocation) {
                 GameManager.shared.currSkin = (GameManager.shared.currSkin + 1) % GameManager.shared.skins.count
                 updateSkin()
+                let playSound = SKAction.playSoundFileNamed("whoosh", waitForCompletion: false)
+                self.run(playSound)
             }
             
             if upArrow.frame.contains(touchLocation) {
                 GameManager.shared.currBack = (GameManager.shared.currBack + 1) % GameManager.shared.backgrounds.count
                 updateBack()
+                let playSound = SKAction.playSoundFileNamed("whoosh", waitForCompletion: false)
+                self.run(playSound)
             }
             
             if leftArrow.frame.contains(touchLocation) {
                 GameManager.shared.currSkin = (GameManager.shared.currSkin - 1 + GameManager.shared.skins.count) % GameManager.shared.skins.count
                 updateSkin()
+                let playSound = SKAction.playSoundFileNamed("whoosh", waitForCompletion: false)
+                self.run(playSound)
             }
             
             if downArrow.frame.contains(touchLocation) {
                 GameManager.shared.currBack = (GameManager.shared.currBack - 1) % GameManager.shared.backgrounds.count
                 updateBack()
+                let playSound = SKAction.playSoundFileNamed("whoosh", waitForCompletion: false)
+                self.run(playSound)
             }
             
             if instructionLabel.frame.contains(touchLocation) {

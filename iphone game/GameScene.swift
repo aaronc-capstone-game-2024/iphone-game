@@ -36,6 +36,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     var scoreLabel = SKLabelNode(text: "Score: \(GameManager.shared.score)")
     var coinLabel = SKLabelNode(text: "0")
     var tapLabel = SKLabelNode(text: "TAP!")
+    var gameOverSoundPlayed = false
     
     var clicks = 10
     var bulletCount = 3
@@ -93,7 +94,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         character.physicsBody?.contactTestBitMask = PhysicsCategory.bullet
         character.physicsBody?.affectedByGravity = false
         character.physicsBody?.isDynamic = true
-        character.zPosition = 2
+        character.zPosition = 3
         self.addChild(character)
         
         tapLabel.fontSize = 100
@@ -145,6 +146,9 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             if clicks == 0 && bulletBody != nil {
                 self.isUserInteractionEnabled = true
             }
+            
+            let playSound = SKAction.playSoundFileNamed("bullet-sound", waitForCompletion: false)
+            self.run(playSound)
         }
         
         // character coin contact logic
@@ -169,6 +173,10 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             GameManager.shared.score += 5
             currCoins += 1
             updateScore()
+            
+            //play sound
+            let playSound = SKAction.playSoundFileNamed("coin-sound", waitForCompletion: false)
+            self.run(playSound)
         }
         
         // character bomb contact logic
@@ -191,9 +199,11 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             let sprite = SKSpriteNode(texture: frames.first)
             sprite.position = CGPoint(x: character.position.x, y: character.position.y)
             sprite.size = CGSize(width: character.size.width * 2.2, height: character.size.height * 2.2)
-            sprite.zPosition = 3
+            sprite.zPosition = 10
             addChild(sprite)
             sprite.run(SKAction.repeat(animation, count: 3))
+            let playSound = SKAction.playSoundFileNamed("bomb-sound", waitForCompletion: false)
+            self.run(playSound)
         }
     }
     
@@ -219,6 +229,10 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                 let impulse = CGVector(dx: direction.dx * impulseMagnitude, dy: direction.dy * impulseMagnitude)
                 character.physicsBody?.applyImpulse(impulse)
                 character.physicsBody?.linearDamping = 1.0
+                
+                //play sound
+                let playSound = SKAction.playSoundFileNamed("jump-sound", waitForCompletion: false)
+                self.run(playSound)
             }
             
             //decrement clicks
@@ -252,6 +266,13 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                 UserDefaults.standard.set(GameManager.shared.score, forKey: "highscore")
             }
             GameManager.shared.score = 0
+            
+            //play sound
+            if !gameOverSoundPlayed {
+                let playSound = SKAction.playSoundFileNamed("game-over-arcade", waitForCompletion: false)
+                self.run(playSound)
+                gameOverSoundPlayed = true
+            }
         }
         
         updateClick()
@@ -295,7 +316,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         bulletsArray.removeAll()
         
         for _ in 0...bulletCount {
-            let bullet = SKSpriteNode(imageNamed: "bullet")
+            let bullet = SKSpriteNode(imageNamed: "bullet-out")
             bullet.size = CGSize(width: 50, height: 50)
             bullet.physicsBody = SKPhysicsBody(rectangleOf: CGSize(width: bullet.frame.width / 1.7, height: bullet.frame.height / 1.4))
             bullet.physicsBody?.isDynamic = false
@@ -334,7 +355,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         coinsArray.removeAll()
         
         for _ in 0...coinCount {
-            let coin = SKSpriteNode(imageNamed: "coin")
+            let coin = SKSpriteNode(imageNamed: "coin-out")
             coin.size = CGSize(width: 50, height: 50)
             coin.physicsBody = SKPhysicsBody(circleOfRadius: coin.frame.height / 2.5)
             coin.physicsBody?.isDynamic = false
@@ -373,7 +394,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         bombsArray.removeAll()
         
         for _ in 0...bombCount {
-            let bomb = SKSpriteNode(imageNamed: "bomb1")
+            let bomb = SKSpriteNode(imageNamed: "bomb-out")
             bomb.size = CGSize(width: 70, height: 70)
             bomb.physicsBody = SKPhysicsBody(circleOfRadius: bomb.frame.height / 2.5)
             bomb.physicsBody?.isDynamic = false
@@ -434,20 +455,20 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     func scoreCoinLabels() {
         scoreLabel.position = CGPoint(x: self.frame.midX - 130, y: self.frame.size.height - 100)
         scoreLabel.fontSize = 25
-        scoreLabel.zPosition = 3
+        scoreLabel.zPosition = 2
         scoreLabel.fontName = "Optima-ExtraBlack"
         scoreLabel.fontColor = UIColor(red: 0.0, green: 0.0, blue: 0.0, alpha: 1.0)
         addChild(scoreLabel)
         
         coinLabel.position = CGPoint(x: self.frame.midX + 130, y: self.frame.size.height - 100)
         coinLabel.fontSize = 25
-        coinLabel.zPosition = 3
+        coinLabel.zPosition = 2
         coinLabel.fontName = "Optima-ExtraBlack"
         coinLabel.fontColor = UIColor(red: 0.0, green: 0.0, blue: 0.0, alpha: 1.0)
         let coinImage = SKSpriteNode(imageNamed: "coin")
         coinImage.size = CGSize(width: 25, height: 25)
         coinImage.position =  CGPoint(x: coinLabel.frame.minX - coinImage.size.width / 2 - 10, y: coinLabel.frame.midY)
-        coinImage.zPosition = 3
+        coinImage.zPosition = 2
         addChild(coinLabel)
         addChild(coinImage)
     }

@@ -14,6 +14,14 @@
 		97672AEE2C3EE954002F6616 /* Base in Resources */ = {isa = PBXBuildFile; fileRef = 97672AED2C3EE954002F6616 /* Base */; };
 		97672AF02C3EE958002F6616 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 97672AEF2C3EE958002F6616 /* Assets.xcassets */; };
 		97672AF32C3EE958002F6616 /* Base in Resources */ = {isa = PBXBuildFile; fileRef = 97672AF22C3EE958002F6616 /* Base */; };
+		9775024F2C5D7E400035ADF5 /* jump-sound.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 9775024E2C5D7E400035ADF5 /* jump-sound.mp3 */; };
+		977502532C5D7F4F0035ADF5 /* falling-sound.wav in Resources */ = {isa = PBXBuildFile; fileRef = 977502522C5D7F4F0035ADF5 /* falling-sound.wav */; };
+		977502552C5D87A90035ADF5 /* coin-sound.wav in Resources */ = {isa = PBXBuildFile; fileRef = 977502542C5D87A90035ADF5 /* coin-sound.wav */; };
+		977502572C5D8A650035ADF5 /* death-sound1.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 977502562C5D8A650035ADF5 /* death-sound1.mp3 */; };
+		977502592C5D8AA90035ADF5 /* game-over-arcade.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 977502582C5D8AA90035ADF5 /* game-over-arcade.mp3 */; };
+		9775025B2C5D92FD0035ADF5 /* bullet-sound.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 9775025A2C5D92FD0035ADF5 /* bullet-sound.mp3 */; };
+		9775025D2C5D93B70035ADF5 /* bomb-sound.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 9775025C2C5D93B70035ADF5 /* bomb-sound.mp3 */; };
+		9775025F2C5D99110035ADF5 /* whoosh.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 9775025E2C5D99110035ADF5 /* whoosh.mp3 */; };
 		97C737972C46E90C001AEEF1 /* MenuScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 97C737962C46E90C001AEEF1 /* MenuScene.swift */; };
 		97D650DB2C5531A20019B5FD /* Tutorial.swift in Sources */ = {isa = PBXBuildFile; fileRef = 97D650DA2C5531A20019B5FD /* Tutorial.swift */; };
 /* End PBXBuildFile section */
@@ -27,6 +35,14 @@
 		97672AED2C3EE954002F6616 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		97672AEF2C3EE958002F6616 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		97672AF22C3EE958002F6616 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		9775024E2C5D7E400035ADF5 /* jump-sound.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "jump-sound.mp3"; sourceTree = "<group>"; };
+		977502522C5D7F4F0035ADF5 /* falling-sound.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = "falling-sound.wav"; sourceTree = "<group>"; };
+		977502542C5D87A90035ADF5 /* coin-sound.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = "coin-sound.wav"; sourceTree = "<group>"; };
+		977502562C5D8A650035ADF5 /* death-sound1.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "death-sound1.mp3"; sourceTree = "<group>"; };
+		977502582C5D8AA90035ADF5 /* game-over-arcade.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "game-over-arcade.mp3"; sourceTree = "<group>"; };
+		9775025A2C5D92FD0035ADF5 /* bullet-sound.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "bullet-sound.mp3"; sourceTree = "<group>"; };
+		9775025C2C5D93B70035ADF5 /* bomb-sound.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "bomb-sound.mp3"; sourceTree = "<group>"; };
+		9775025E2C5D99110035ADF5 /* whoosh.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = whoosh.mp3; sourceTree = "<group>"; };
 		97C737962C46E90C001AEEF1 /* MenuScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuScene.swift; sourceTree = "<group>"; };
 		97D650DA2C5531A20019B5FD /* Tutorial.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tutorial.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -68,6 +84,14 @@
 				97518D822C51546F00B6BBF3 /* GameManager.swift */,
 				97D650DA2C5531A20019B5FD /* Tutorial.swift */,
 				97672AEC2C3EE954002F6616 /* Main.storyboard */,
+				9775025A2C5D92FD0035ADF5 /* bullet-sound.mp3 */,
+				9775025C2C5D93B70035ADF5 /* bomb-sound.mp3 */,
+				977502542C5D87A90035ADF5 /* coin-sound.wav */,
+				977502562C5D8A650035ADF5 /* death-sound1.mp3 */,
+				977502582C5D8AA90035ADF5 /* game-over-arcade.mp3 */,
+				977502522C5D7F4F0035ADF5 /* falling-sound.wav */,
+				9775024E2C5D7E400035ADF5 /* jump-sound.mp3 */,
+				9775025E2C5D99110035ADF5 /* whoosh.mp3 */,
 				97672AEF2C3EE958002F6616 /* Assets.xcassets */,
 				97672AF12C3EE958002F6616 /* LaunchScreen.storyboard */,
 			);
@@ -133,8 +157,16 @@
 			buildActionMask = 2147483647;
 			files = (
 				97672AEE2C3EE954002F6616 /* Base in Resources */,
+				9775025B2C5D92FD0035ADF5 /* bullet-sound.mp3 in Resources */,
+				9775025D2C5D93B70035ADF5 /* bomb-sound.mp3 in Resources */,
 				97672AF02C3EE958002F6616 /* Assets.xcassets in Resources */,
+				977502592C5D8AA90035ADF5 /* game-over-arcade.mp3 in Resources */,
+				9775024F2C5D7E400035ADF5 /* jump-sound.mp3 in Resources */,
+				977502552C5D87A90035ADF5 /* coin-sound.wav in Resources */,
+				9775025F2C5D99110035ADF5 /* whoosh.mp3 in Resources */,
+				977502532C5D7F4F0035ADF5 /* falling-sound.wav in Resources */,
 				97672AF32C3EE958002F6616 /* Base in Resources */,
+				977502572C5D8A650035ADF5 /* death-sound1.mp3 in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -304,7 +336,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = TXW6LVPGD8;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_CFBundleDisplayName = masorchi;
+				INFOPLIST_KEY_CFBundleDisplayName = Masorchi;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UIMainStoryboardFile = Main;
@@ -333,7 +365,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = TXW6LVPGD8;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_CFBundleDisplayName = masorchi;
+				INFOPLIST_KEY_CFBundleDisplayName = Masorchi;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UIMainStoryboardFile = Main;

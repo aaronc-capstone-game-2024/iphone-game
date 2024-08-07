@@ -187,7 +187,11 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             bombBody = contact.bodyB
         }
         
-        if bombBody?.node is SKSpriteNode {
+        if let bombNode = bombBody?.node as? SKSpriteNode, let index = bombsArray.firstIndex(of: bombNode) {
+            
+            bombNode.removeFromParent()
+            bombsArray.remove(at: index)
+            
             gameOver()
             
             if GameManager.shared.score > UserDefaults.standard.integer(forKey: "highscore") {

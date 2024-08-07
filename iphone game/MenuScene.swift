@@ -156,29 +156,29 @@ class MenuScene: SKScene {
             if rightArrow.frame.contains(touchLocation) {
                 GameManager.shared.currSkin = (GameManager.shared.currSkin + 1) % GameManager.shared.skins.count
                 updateSkin()
-                let playSound = SKAction.playSoundFileNamed("whoosh", waitForCompletion: false)
-                self.run(playSound)
+//                let playSound = SKAction.playSoundFileNamed("whoosh", waitForCompletion: false)
+//                self.run(playSound)
             }
             
             if upArrow.frame.contains(touchLocation) {
                 GameManager.shared.currBack = (GameManager.shared.currBack + 1) % GameManager.shared.backgrounds.count
                 updateBack()
-                let playSound = SKAction.playSoundFileNamed("whoosh", waitForCompletion: false)
-                self.run(playSound)
+//                let playSound = SKAction.playSoundFileNamed("whoosh", waitForCompletion: false)
+//                self.run(playSound)
             }
             
             if leftArrow.frame.contains(touchLocation) {
                 GameManager.shared.currSkin = (GameManager.shared.currSkin - 1 + GameManager.shared.skins.count) % GameManager.shared.skins.count
                 updateSkin()
-                let playSound = SKAction.playSoundFileNamed("whoosh", waitForCompletion: false)
-                self.run(playSound)
+//                let playSound = SKAction.playSoundFileNamed("whoosh", waitForCompletion: false)
+//                self.run(playSound)
             }
             
             if downArrow.frame.contains(touchLocation) {
-                GameManager.shared.currBack = (GameManager.shared.currBack - 1) % GameManager.shared.backgrounds.count
+                GameManager.shared.currBack = (GameManager.shared.currBack - 1 + GameManager.shared.backgrounds.count) % GameManager.shared.backgrounds.count
                 updateBack()
-                let playSound = SKAction.playSoundFileNamed("whoosh", waitForCompletion: false)
-                self.run(playSound)
+//                let playSound = SKAction.playSoundFileNamed("whoosh", waitForCompletion: false)
+//                self.run(playSound)
             }
             
             if instructionLabel.frame.contains(touchLocation) {
@@ -199,6 +199,12 @@ class MenuScene: SKScene {
     }
     
     func updateBack() {
-        background.texture = SKTexture(imageNamed: GameManager.shared.backgrounds[GameManager.shared.currBack])
+        if GameManager.shared.backgrounds.indices.contains(GameManager.shared.currBack) {
+            background.texture = SKTexture(imageNamed: GameManager.shared.backgrounds[GameManager.shared.currBack])
+        } else {
+            // Log error or handle the case where the index is out of range, e.g., reset to default
+            GameManager.shared.currBack = 0
+            background.texture = SKTexture(imageNamed: GameManager.shared.backgrounds[GameManager.shared.currBack])
+        }
     }
 }

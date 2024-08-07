@@ -6,7 +6,7 @@
 //
 
 import UIKit
-import AVFoundation // Import AVFoundation
+import AVFoundation
 
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -14,9 +14,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     var window: UIWindow?
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-        // Override point for customization after application launch.
-        
-        // Configure the audio session
         configureAudioSession()
         
         return true
@@ -26,7 +23,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         do {
             try AVAudioSession.sharedInstance().setCategory(.playback, mode: .default)
             try AVAudioSession.sharedInstance().setActive(true)
-            print("AudioSession is successfully configured!")
         } catch {
             print("Failed to configure AudioSession: \(error)")
         }

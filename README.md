@@ -3,7 +3,7 @@
 <!-- PROJECT LOGO -->
 <br />
 <div align="center">
-    <img src="Assets.xcassets/monster.imageset/monster1.png" alt="Logo" width="80" height="80"> 
+    <img src="monster1.png" alt="Logo" width="80" height="80"> 
   </img>
 
 <h3 align="center">Masorchi</h3>

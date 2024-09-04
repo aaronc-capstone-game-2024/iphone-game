@@ -56,7 +56,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     ]
     
     func positionOverlaps(_ newPosition: CGPoint) -> Bool {
-        let safeZoneRadius: CGFloat = 50 
+        let safeZoneRadius: CGFloat = 15
 
         for (_, positions) in itemPosition {
             for position in positions {
@@ -336,6 +336,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 
     func spawnBullets() {
         for bullet in bulletsArray {
+            
             if bullet.parent != nil {
                 bullet.removeFromParent()
             }
@@ -416,6 +417,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         for bomb in bombsArray {
             if bomb.parent != nil {
                 bomb.removeFromParent()
+                // Ensure to also remove the old position from itemPosition
+            itemPosition["bombs"]?.removeAll(where: { $0 == bomb.position })
             }
             
             var newBombPosition: CGPoint

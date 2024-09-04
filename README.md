@@ -29,6 +29,8 @@ Designed for both casual gamers and hardcore enthusiasts, Masorchi aims to bridg
 
 Thank you for your interest in Masorchi. Dive in and enjoy a game where every tap brings you closer to beating your high score!
 
+https://apps.apple.com/us/app/masorchi/id6608964082
+
 <img src="appstore.png">
 
 ### Built With

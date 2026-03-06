@@ -29,8 +29,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     var ground = SKSpriteNode()
     var character = SKSpriteNode()
     var bulletsArray = [SKSpriteNode()]
-    var coinsArray = [SKSpriteNode()]
-    var bombsArray = [SKSpriteNode()]
+    var coinsArray = [SKSpriteNode]()
+    var bombsArray = [SKSpriteNode]()
     var frames: [SKTexture] = []
     var labelClicks = SKLabelNode(fontNamed: "AvenirNext-Bold")
     var scoreLabel = SKLabelNode(text: "Score: \(GameManager.shared.score)")
@@ -55,17 +55,79 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         "bombs": []
     ]
     
-    func positionOverlaps(_ newPosition: CGPoint) -> Bool {
-        let safeZoneRadius: CGFloat = 15
+    // Radii used to prevent overlap between items and with the character
+    private func radius(for nodeType: String) -> CGFloat {
+        switch nodeType {
+        case "bullets": return 25 // bullet.size ~50
+        case "coins": return 25   // coin.size ~50
+        case "bombs": return 35   // bomb.size ~70
+        case "character": return max(character.size.width, character.size.height) / 2.35
+        default: return 25
+        }
+    }
 
-        for (_, positions) in itemPosition {
-            for position in positions {
-                if (position - newPosition).length() <= safeZoneRadius {
-                    return true
+    private func isPositionAvailable(_ position: CGPoint, for type: String, minDistance: CGFloat = 0) -> Bool {
+        // Check against existing items of all types
+        for (key, positions) in itemPosition {
+            let r1 = radius(for: type)
+            let r2 = radius(for: key)
+            let required = max(r1 + r2, minDistance)
+            for p in positions {
+                if (p - position).length() < required {
+                    return false
                 }
             }
         }
-        return false
+        // Also avoid spawning directly on the character
+        let characterRequired = radius(for: type) + radius(for: "character")
+        if (character.position - position).length() < characterRequired {
+            return false
+        }
+        return true
+    }
+
+    private func randomPosition(inset: CGFloat = 80) -> CGPoint {
+        let x = CGFloat.random(in: 0..<(self.frame.width - inset))
+        let y = CGFloat.random(in: 0..<(self.frame.height - inset))
+        return CGPoint(x: x, y: y)
+    }
+
+    private func placeNodes(count: Int, type: String, makeNode: () -> SKSpriteNode) {
+        // Ensure we clear positions for this type before placing new ones
+        itemPosition[type]?.removeAll()
+
+        var created: [SKSpriteNode] = []
+        let maxAttempts = 200
+        for _ in 0...count {
+            var attempts = 0
+            var pos = CGPoint.zero
+            repeat {
+                pos = randomPosition()
+                attempts += 1
+            } while !isPositionAvailable(pos, for: type) && attempts < maxAttempts
+
+            let node = makeNode()
+            node.position = pos
+            created.append(node)
+            itemPosition[type]?.append(pos)
+        }
+
+        // Remove any existing nodes of this type from the scene and arrays
+        switch type {
+        case "bullets":
+            bulletsArray.forEach { $0.removeFromParent() }
+            bulletsArray = created
+        case "coins":
+            coinsArray.forEach { $0.removeFromParent() }
+            coinsArray = created
+        case "bombs":
+            bombsArray.forEach { $0.removeFromParent() }
+            bombsArray = created
+        default: break
+        }
+
+        // Add to scene
+        created.forEach { addChild($0) }
     }
     
     override func didMove(to view: SKView) {
@@ -103,6 +165,10 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         tapLabel.fontColor = UIColor(red: 0.0, green: 0.0, blue: 0.0, alpha: 0.7)
         tapLabel.zPosition = 2
         addChild(tapLabel)
+
+        itemPosition["bullets"]?.removeAll()
+        itemPosition["coins"]?.removeAll()
+        itemPosition["bombs"]?.removeAll()
                 
         createBullets()
         createCoins()
@@ -124,6 +190,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             
             bulletNode.removeFromParent()
             bulletsArray.remove(at: index)
+            itemPosition["bullets"]?.removeAll(where: { $0 == bulletNode.position })
 
             // clicks and bullets count logic
             clicks += 1
@@ -163,6 +230,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             
             coinNode.removeFromParent()
             coinsArray.remove(at: index)
+            itemPosition["coins"]?.removeAll(where: { $0 == coinNode.position })
             
             coinCount -= 1
             if coinCount < 0 {
@@ -191,6 +259,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             
             bombNode.removeFromParent()
             bombsArray.remove(at: index)
+            itemPosition["bombs"]?.removeAll(where: { $0 == bombNode.position })
             
             gameOver()
             
@@ -316,10 +385,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     }
     
     func createBullets() {
-        bulletsArray.forEach { $0.removeFromParent() }
-        bulletsArray.removeAll()
-        
-        for _ in 0...bulletCount {
+        placeNodes(count: bulletCount, type: "bullets") { () -> SKSpriteNode in
             let bullet = SKSpriteNode(imageNamed: "bullet-out")
             bullet.size = CGSize(width: 50, height: 50)
             bullet.physicsBody = SKPhysicsBody(rectangleOf: CGSize(width: bullet.frame.width / 1.7, height: bullet.frame.height / 1.4))
@@ -328,38 +394,12 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             bullet.physicsBody?.contactTestBitMask = PhysicsCategory.character | PhysicsCategory.bomb
             bullet.physicsBody?.collisionBitMask = 0
             bullet.zPosition = 3
-            bulletsArray.append(bullet)
-        }
-        
-        spawnBullets()
-    }
-
-    func spawnBullets() {
-        for bullet in bulletsArray {
-            
-            if bullet.parent != nil {
-                bullet.removeFromParent()
-            }
-            
-            var newBulletPosition: CGPoint
-            repeat {
-                newBulletPosition = CGPoint(
-                    x: CGFloat.random(in: 0..<self.frame.width - 80),
-                    y: CGFloat.random(in: 0..<self.frame.height - 80)
-                )
-            } while positionOverlaps(newBulletPosition)
-
-            bullet.position = newBulletPosition
-            itemPosition["bullets"]?.append(newBulletPosition)
-            addChild(bullet)
+            return bullet
         }
     }
-    
+
     func createCoins() {
-        coinsArray.forEach { $0.removeFromParent() }
-        coinsArray.removeAll()
-        
-        for _ in 0...coinCount {
+        placeNodes(count: coinCount, type: "coins") { () -> SKSpriteNode in
             let coin = SKSpriteNode(imageNamed: "coin-out")
             coin.size = CGSize(width: 50, height: 50)
             coin.physicsBody = SKPhysicsBody(circleOfRadius: coin.frame.height / 2.5)
@@ -368,37 +408,12 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             coin.physicsBody?.contactTestBitMask = PhysicsCategory.character | PhysicsCategory.bomb
             coin.physicsBody?.collisionBitMask = 0
             coin.zPosition = 3
-            coinsArray.append(coin)
-        }
-        
-        spawnCoins()
-    }
-    
-    func spawnCoins() {
-        for coin in coinsArray {
-            if coin.parent != nil {
-                coin.removeFromParent()
-            }
-            
-            var newCoinPosition: CGPoint
-            repeat {
-                newCoinPosition = CGPoint(
-                    x: CGFloat.random(in: 0..<self.frame.width - 80),
-                    y: CGFloat.random(in: 0..<self.frame.height - 80)
-                )
-            } while positionOverlaps(newCoinPosition)
-
-            coin.position = newCoinPosition
-            itemPosition["coins"]?.append(newCoinPosition)
-            addChild(coin)
+            return coin
         }
     }
     
     func createBombs() {
-        bombsArray.forEach { $0.removeFromParent() }
-        bombsArray.removeAll()
-        
-        for _ in 0...bombCount {
+        placeNodes(count: bombCount, type: "bombs") { () -> SKSpriteNode in
             let bomb = SKSpriteNode(imageNamed: "bomb-out")
             bomb.size = CGSize(width: 70, height: 70)
             bomb.physicsBody = SKPhysicsBody(circleOfRadius: bomb.frame.height / 2.5)
@@ -407,36 +422,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             bomb.physicsBody?.contactTestBitMask = PhysicsCategory.character
             bomb.physicsBody?.collisionBitMask = 0
             bomb.zPosition = 3
-            bombsArray.append(bomb)
-        }
-        
-        spawnBombs()
-    }
-    
-    func spawnBombs() {
-        for bomb in bombsArray {
-            if bomb.parent != nil {
-                bomb.removeFromParent()
-                // Ensure to also remove the old position from itemPosition
-            itemPosition["bombs"]?.removeAll(where: { $0 == bomb.position })
-            }
-            
-            var newBombPosition: CGPoint
-            let safeZoneRadius: CGFloat = 100
-            var randomX: CGFloat = 0
-            var randomY: CGFloat = 0
-            repeat {
-                randomX = CGFloat.random(in: 1...(self.frame.width - 100))
-                randomY = CGFloat.random(in: 1...(self.frame.width - 100))
-                newBombPosition = CGPoint(
-                    x: randomX,
-                    y: randomY
-                )
-            } while positionOverlaps(newBombPosition) &&  sqrt(pow(randomX - frame.midX, 2) + pow(randomY - frame.midY, 2)) < safeZoneRadius
-
-            bomb.position = newBombPosition
-            itemPosition["bombs"]?.append(newBombPosition)
-            addChild(bomb)
+            return bomb
         }
     }
     
